@@ -7,7 +7,7 @@ import {
   Inter_700Bold_Italic,
 } from "@expo-google-fonts/inter";
 import { useFonts } from "@expo-google-fonts/inter/useFonts";
-import { Slot, SplashScreen } from "expo-router";
+import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
@@ -32,5 +32,15 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Slot />;
+  return (
+    <Stack>
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+          title: "Home",
+        }}
+      />
+    </Stack>
+  );
 }
