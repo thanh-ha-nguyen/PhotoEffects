@@ -63,11 +63,11 @@ export default function ProjectsStack() {
     <SafeAreaView style={styles.container}>
       <FlatList
         data={images}
-        keyExtractor={(item, idx) => item.uri + idx}
-        renderItem={({ item: { uri } }) => (
-          <Link href={`/${encodeURIComponent(uri)}`} asChild>
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item }) => (
+          <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
             <TouchableOpacity style={{ margin: 8 }}>
-              <Image source={{ uri }} style={styles.image} />
+              <Image source={{ uri: item.uri }} style={styles.image} />
             </TouchableOpacity>
           </Link>
         )}
