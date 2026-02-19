@@ -1,3 +1,5 @@
+import db from "@/persistence/db";
+import migrations from "@/persistence/drizzle/migrations";
 import {
   Inter_100Thin,
   Inter_100Thin_Italic,
@@ -7,13 +9,21 @@ import {
   Inter_700Bold_Italic,
 } from "@expo-google-fonts/inter";
 import { useFonts } from "@expo-google-fonts/inter/useFonts";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
+import { Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [isReady] = useFonts({
+  const { success: migrationsSuccess, error: migrationError } = useMigrations(
+    db,
+    migrations,
+  );
+
+  const [fontsLoaded] = useFonts({
     "Inter Thin": Inter_100Thin,
     "Inter Regular": Inter_400Regular,
     "Inter Bold": Inter_700Bold,
@@ -23,13 +33,33 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (isReady) {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [isReady]);
+  }, [fontsLoaded]);
 
-  if (!isReady) {
-    return null;
+  if (migrationError) {
+    return (
+      <SafeAreaView>
+        <Text>Migration error: {migrationError.message}</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!migrationsSuccess) {
+    return (
+      <SafeAreaView>
+        <Text>Migration is in progress...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView>
+        <Text>Fonts are loading...</Text>
+      </SafeAreaView>
+    );
   }
 
   return (

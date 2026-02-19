@@ -1,5 +1,7 @@
+import { PhotoEntity } from "@/persistence/schema";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { Link } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Button,
   FlatList,
@@ -9,9 +11,22 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getAllPhotos, savePhoto } from "../../persistence/photos";
 
 export default function ProjectsStack() {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<PhotoEntity[]>([]);
+
+  // Load images from DB on mount
+  useEffect(() => {
+    async function loadPhotosFromDb() {
+      const photos = await getAllPhotos();
+      if (photos && photos.length > 0) {
+        setImages(photos);
+      }
+    }
+
+    loadPhotosFromDb();
+  }, []);
 
   const pickImages = async () => {
     // Ask for permission
@@ -20,6 +35,7 @@ export default function ProjectsStack() {
       alert("Sorry, we need camera roll permissions to make this work!");
       return;
     }
+
     // Pick multiple images
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -27,8 +43,19 @@ export default function ProjectsStack() {
       quality: 1,
       selectionLimit: 10,
     });
-    if (!result.canceled && result.assets) {
-      setImages(result.assets.map((asset) => asset.uri));
+
+    if (!result.canceled && result.assets.length > 0) {
+      // Update state with new images
+      const selectedPhotos = result.assets.map((asset) => ({
+        uri: asset.uri,
+        mimeType: asset.mimeType || null,
+        width: asset.width,
+        height: asset.height,
+      }));
+
+      // Save each image to DB
+      const savedPhotos = await savePhoto(...selectedPhotos);
+      setImages((current) => [...current, ...savedPhotos]);
     }
   };
 
@@ -36,11 +63,13 @@ export default function ProjectsStack() {
     <SafeAreaView style={styles.container}>
       <FlatList
         data={images}
-        keyExtractor={(item, idx) => item + idx}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={{ margin: 8 }}>
-            <Image source={{ uri: item }} style={styles.image} />
-          </TouchableOpacity>
+        keyExtractor={(item, idx) => item.uri + idx}
+        renderItem={({ item: { uri } }) => (
+          <Link href={`/${encodeURIComponent(uri)}`} asChild>
+            <TouchableOpacity style={{ margin: 8 }}>
+              <Image source={{ uri }} style={styles.image} />
+            </TouchableOpacity>
+          </Link>
         )}
         horizontal={false}
         numColumns={3}
