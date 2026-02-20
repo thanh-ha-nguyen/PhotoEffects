@@ -3,6 +3,11 @@
 # dependencies
 node_modules/
 
+# 3rd party libs and modules
+libs/*
+!libs/README.md
+modules/*/ios/Frameworks
+
 # Expo
 .expo/
 dist/

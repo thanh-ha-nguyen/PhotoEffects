@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAllPhotos, savePhoto } from "../../persistence/photos";
@@ -74,10 +75,12 @@ export default function ProjectsStack() {
         horizontal={false}
         numColumns={3}
         style={styles.imageList}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No photos selected.</Text>
-        }
       />
+      {images.length === 0 && (
+        <View style={[styles.container, StyleSheet.absoluteFill]}>
+          <Text style={styles.emptyText}>No photos selected.</Text>
+        </View>
+      )}
       <Button title="Pick Photos from Gallery" onPress={pickImages} />
     </SafeAreaView>
   );
@@ -103,6 +106,5 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: "#888",
-    margin: "auto",
   },
 });

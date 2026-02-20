@@ -10,3 +10,6 @@ insert_final_newline = true
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.{h,m,mm}]
+indent_size = 4
