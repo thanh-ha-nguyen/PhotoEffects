@@ -1,3 +1,4 @@
+import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
 import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
@@ -5,7 +6,6 @@ import { useEffect, useState } from "react";
 import {
   Button,
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -68,7 +68,7 @@ export default function ProjectsStack() {
         renderItem={({ item }) => (
           <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
             <TouchableOpacity style={{ margin: 8 }}>
-              <Image source={{ uri: item.uri }} style={styles.image} />
+              <OpenCVImage source={{ uri: item.uri }} style={styles.image} />
             </TouchableOpacity>
           </Link>
         )}
