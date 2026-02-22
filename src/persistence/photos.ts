@@ -1,20 +1,23 @@
 import { eq, sql } from "drizzle-orm";
 import db from "./db";
-import { Photo, photos as photosSchema } from "./schema";
+import { Photo, photos } from "./schema";
 
-export async function savePhoto(...photos: Photo[]) {
+export async function savePhoto(...values: Photo[]) {
   return await db
-    .insert(photosSchema)
+    .insert(photos)
     .values(
-      photos.map((photo) => ({ ...photo, createdAt: sql`CURRENT_TIMESTAMP` })),
+      values.map((value) => ({ ...value, createdAt: sql`CURRENT_TIMESTAMP` })),
     )
     .returning();
 }
 
 export async function getAllPhotos() {
-  return db.select().from(photosSchema).all();
+  return db.select().from(photos).all();
 }
 
 export async function getPhotoById(id: number) {
-  return db.select().from(photosSchema).where(eq(photosSchema.id, id)).get();
+  return db.query.photos.findFirst({
+    with: { effects: true },
+    where: eq(photos.id, id),
+  });
 }

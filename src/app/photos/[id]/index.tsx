@@ -1,7 +1,7 @@
 import PanZoomView from "@/components/PanZoomView";
+import { OpenCVImage } from "@/modules/expo-opencv";
 import { getPhotoById } from "@/persistence/photos";
 import { PhotoEntity } from "@/persistence/schema";
-import { Image } from "expo-image";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
@@ -26,8 +26,9 @@ export default function ProjectStack() {
       <Stack.Screen options={{ headerTitle }} />
       {photo && (
         <PanZoomView width={photo.width} height={photo.height}>
-          <Image
+          <OpenCVImage
             source={{ uri: photo.uri }}
+            effects={[]}
             contentFit="contain"
             style={StyleSheet.absoluteFill}
           />

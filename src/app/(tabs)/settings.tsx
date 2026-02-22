@@ -1,18 +1,17 @@
 import db from "@/persistence/db";
 import migrations from "@/persistence/drizzle/migrations";
-import * as schema from "@/persistence/schema";
+import { photoEffects, photos } from "@/persistence/schema";
 import { getTableName } from "drizzle-orm";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
-import { Link } from "expo-router";
 import { Button, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsTab() {
   const handleDeleteDatabase = async () => {
     db.run(`DROP TABLE IF EXISTS "__drizzle_migrations"`);
-    for (const table of Object.values(schema)) {
-      db.run(`DROP TABLE IF EXISTS "${getTableName(table)}"`);
-    }
+    db.run(`DROP TABLE IF EXISTS "${getTableName(photoEffects)}"`);
+    db.run(`DROP TABLE IF EXISTS "${getTableName(photos)}"`);
+
     try {
       await db.transaction(async (tx) => {
         await migrate(tx, migrations);
@@ -28,12 +27,7 @@ export default function SettingsTab() {
       <Text style={styles.text}>
         Edit app/(tabs)/settings.tsx to edit this screen.
       </Text>
-      {process.env.EXPO_PUBLIC_ALLOW_MODULE_TEST === "yes" && (
-        <Link href="/module-test" asChild>
-          <Button title="Open Module Test" />
-        </Link>
-      )}
-      {process.env.EXPO_PUBLIC_ALLOW_MODULE_TEST === "yes" && (
+      {process.env.EXPO_PUBLIC_ALLOW_DELETE_DB === "yes" && (
         <Button title="Delete database" onPress={handleDeleteDatabase} />
       )}
     </SafeAreaView>
