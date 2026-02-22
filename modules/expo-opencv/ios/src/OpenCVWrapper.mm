@@ -13,68 +13,25 @@
 #import <opencv2/imgcodecs/ios.h>
 #import "OpenCVWrapper.h"
 
-@interface UIImage (Conversion)
-- (cv::Mat)toCVMat;
-+ (UIImage *)fromCVMat:(cv::Mat)cvMat;
+@interface UIImage (Normalization)
+- (UIImage *)normalize;
 @end
 
-@implementation UIImage (Conversion)
+@implementation UIImage (Normalization)
 
-- (cv::Mat)toCVMat {
-    CGColorSpaceRef colorSpace = CGImageGetColorSpace(self.CGImage);
-    CGFloat cols = self.size.width;
-    CGFloat rows = self.size.height;
-    
-    cv::Mat cvMat(rows, cols, CV_8UC4); // 8 bits per component, 4 channels (color channels + alpha)
-    
-    CGContextRef contextRef = CGBitmapContextCreate(cvMat.data,                 // Pointer to  data
-                                                    cols,                       // Width of bitmap
-                                                    rows,                       // Height of bitmap
-                                                    8,                          // Bits per component
-                                                    cvMat.step[0],              // Bytes per row
-                                                    colorSpace,                 // Colorspace
-                                                    kCGImageAlphaNoneSkipLast |
-                                                    kCGBitmapByteOrderDefault); // Bitmap info flags
-    
-    CGContextDrawImage(contextRef, CGRectMake(0, 0, cols, rows), self.CGImage);
-    CGContextRelease(contextRef);
-    
-    return cvMat;
-}
+- (UIImage *)normalize
+{
+    if (self.imageOrientation == UIImageOrientationUp) return self;
 
-+ (UIImage *)fromCVMat:(cv::Mat)cvMat {
-    NSData *data = [NSData dataWithBytes:cvMat.data length:cvMat.elemSize()*cvMat.total()];
-    CGColorSpaceRef colorSpace;
-    
-    if (cvMat.elemSize() == 1) {
-        colorSpace = CGColorSpaceCreateDeviceGray();
-    } else {
-        colorSpace = CGColorSpaceCreateDeviceRGB();
+    bool isOpaque = CGColorSpaceGetNumberOfComponents(CGImageGetColorSpace(self.CGImage)) <= 3;
+    UIGraphicsBeginImageContextWithOptions(self.size, isOpaque, self.scale);
+    @try {
+        [self drawInRect:CGRectMake(0, 0, self.size.width, self.size.height)];
+        return UIGraphicsGetImageFromCurrentImageContext();
     }
-    
-    CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
-    
-    // Creating CGImage from cv::Mat
-    CGImageRef imageRef = CGImageCreate(cvMat.cols,                                 //width
-                                        cvMat.rows,                                 //height
-                                        8,                                          //bits per component
-                                        8 * cvMat.elemSize(),                       //bits per pixel
-                                        cvMat.step[0],                              //bytesPerRow
-                                        colorSpace,                                 //colorspace
-                                        kCGImageAlphaNone|kCGBitmapByteOrderDefault,// bitmap info
-                                        provider,                                   //CGDataProviderRef
-                                        NULL,                                       //decode
-                                        false,                                      //should interpolate
-                                        kCGRenderingIntentDefault                   //intent
-                                        );
-    
-    // Getting UIImage from CGImage
-    UIImage *image = [UIImage imageWithCGImage:imageRef];
-    CGImageRelease(imageRef);
-    CGDataProviderRelease(provider);
-    CGColorSpaceRelease(colorSpace);
-    
-    return image;
+    @finally {
+        UIGraphicsEndImageContext();
+    }
 }
 
 @end
@@ -90,7 +47,12 @@
         return self;
     }
     
-    cv::Mat mat = [self toCVMat];
+    UIImage *image = [self normalize];
+    
+    bool hasAlpha = CGColorSpaceGetNumberOfComponents(CGImageGetColorSpace(image.CGImage)) > 3;
+    cv::Mat mat;
+    UIImageToMat(image, mat, hasAlpha);
+    
     for (int index = 0; index < effects.count; index++)
     {
         id effect = effects[index];
@@ -113,9 +75,12 @@
         {
             NSString *methodSelector = [name stringByAppendingString:@":withOptions:"];
             SEL selector = NSSelectorFromString(methodSelector);
+            if (![UIImage respondsToSelector:selector]) {
+                continue;
+            }
             IMP method = [UIImage methodForSelector:selector];
             cv::Mat (*effectMethod)(id, SEL, cv::Mat, NSDictionary *) = (cv::Mat (*) (id, SEL, cv::Mat, NSDictionary *))method;
-            mat = effectMethod(self, selector, mat, options);
+            mat = effectMethod(nil, selector, mat, options);
         }
         catch (cv::Exception exception)
         {
@@ -124,7 +89,8 @@
                   name, exception.code, errorMessage);
         }
     }
-    return [UIImage fromCVMat:mat];
+    
+    return MatToUIImage(mat);
 }
 
 + (cv::Mat)grayscale:(cv::Mat)mat withOptions:(NSDictionary *)options {
