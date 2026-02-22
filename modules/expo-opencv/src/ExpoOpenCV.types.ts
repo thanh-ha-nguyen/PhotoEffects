@@ -891,18 +891,22 @@ enum BorderTypes {
   BORDER_ISOLATED = 16, //!< Interpolation restricted within the ROI boundaries.
 }
 
-type BlurEffect =
-  | "blur"
-  | {
-      name: "blur";
-      options?: {
-        anchorPointX?: number;
-        anchorPointY?: number;
-        borderType?: BorderTypes;
-        ksizeWidth?: number;
-        ksizeHeight?: number;
-      };
-    };
-type GrayscaleEffect = "grayscale" | { name: "grayscale" };
+export const ImageEffects = [
+  // Add more effects here in the future
+  "blur",
+  "grayscale",
+] as const;
+export type ImageEffectTypes = (typeof ImageEffects)[number];
+type BlurEffect = {
+  name: "blur";
+  options?: {
+    anchorPointX?: number;
+    anchorPointY?: number;
+    borderType?: BorderTypes;
+    ksizeWidth?: number;
+    ksizeHeight?: number;
+  };
+};
+type GrayscaleEffect = { name: "grayscale"; options?: null };
 export type ImageEffect = // Add more effects here in the future
-  GrayscaleEffect | BlurEffect;
+  ImageEffectTypes | GrayscaleEffect | BlurEffect;

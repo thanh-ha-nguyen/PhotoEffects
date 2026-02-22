@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAllPhotos, savePhoto } from "../../persistence/photos";
+import { getAllPhotos, insertPhotos } from "../../persistence/photos";
 
 export default function ProjectsStack() {
   const [images, setImages] = useState<PhotoEntity[]>([]);
@@ -55,7 +55,7 @@ export default function ProjectsStack() {
       }));
 
       // Save each image to DB
-      const savedPhotos = await savePhoto(...selectedPhotos);
+      const savedPhotos = await insertPhotos(...selectedPhotos);
       setImages((current) => [...current, ...savedPhotos]);
     }
   };

@@ -15,6 +15,13 @@
       "when": 1771752384553,
       "tag": "0001_add_photo_effects",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771773571212,
+      "tag": "0002_add_order_column_to_photo_effects",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `photo_effects` ADD `order` integer NOT NULL;

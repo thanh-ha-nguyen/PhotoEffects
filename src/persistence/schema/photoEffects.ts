@@ -10,6 +10,7 @@ const photoEffects = sqliteTable(
   "photo_effects",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
+    order: integer("order").notNull(),
     effectName: text("effect_name").notNull(),
     effectOptions: text("effect_options_json"),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
