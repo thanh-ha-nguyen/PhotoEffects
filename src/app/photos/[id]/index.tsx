@@ -1,4 +1,5 @@
 import PanZoomView from "@/components/PanZoomView";
+import withPerformanceModeSettings from "@/components/withPerformanceModeSettings";
 import {
   ImageEffect,
   ImageEffectTypes,
@@ -6,7 +7,7 @@ import {
 } from "@/modules/expo-opencv";
 import { getPhotoById, savePhotoEffectsByPhotoId } from "@/persistence/photos";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -20,7 +21,7 @@ type ImageEffectWithId = Exclude<ImageEffect, ImageEffectTypes> & {
   id?: number;
 };
 
-export default function ProjectStack() {
+const ImageEditorScreen: React.FC = () => {
   const [headerTitle, setHeaderTitle] = useState("Loading...");
   const [photo, setPhoto] = useState<PhotoEntityWithEffects | undefined>();
   const [effects, setEffects] = useState<ImageEffectWithId[]>([]);
@@ -80,7 +81,9 @@ export default function ProjectStack() {
       </View>
     </GestureHandlerRootView>
   );
-}
+};
+
+export default withPerformanceModeSettings(ImageEditorScreen);
 
 const styles = StyleSheet.create({
   container: {

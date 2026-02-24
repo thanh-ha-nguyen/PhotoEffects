@@ -1,3 +1,4 @@
+import withPerformanceModeSettings from "@/components/withPerformanceModeSettings";
 import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
 import * as ImagePicker from "expo-image-picker";
@@ -14,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAllPhotos, insertPhotos } from "../../persistence/photos";
 
-export default function ProjectsStack() {
+const ImagesListScreen: React.FC = () => {
   const [images, setImages] = useState<PhotoEntity[]>([]);
 
   // Load images from DB on mount
@@ -84,7 +85,9 @@ export default function ProjectsStack() {
       <Button title="Pick Photos from Gallery" onPress={pickImages} />
     </SafeAreaView>
   );
-}
+};
+
+export default withPerformanceModeSettings(ImagesListScreen);
 
 const styles = StyleSheet.create({
   container: {
