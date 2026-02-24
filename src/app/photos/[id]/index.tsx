@@ -6,6 +6,7 @@ import {
   OpenCVImage,
 } from "@/modules/expo-opencv";
 import { getPhotoById, savePhotoEffectsByPhotoId } from "@/persistence/photos";
+import styled from "@/utils/styled";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -55,7 +56,7 @@ const ImageEditorScreen: React.FC = () => {
     };
 
   return (
-    <GestureHandlerRootView style={[StyleSheet.absoluteFill, styles.container]}>
+    <StyledGestureHandlerRootView style={StyleSheet.absoluteFill}>
       <Stack.Screen options={{ headerTitle }} />
       {photo && (
         <PanZoomView width={photo.width} height={photo.height}>
@@ -67,29 +68,32 @@ const ImageEditorScreen: React.FC = () => {
           />
         </PanZoomView>
       )}
-      <View style={styles.bottomButtons}>
+      <BottomButtonsContainer>
         <TouchableOpacity onPress={addEffect("grayscale")}>
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Grayscale</Text>
-          </View>
+          <Button>
+            <ButtonText>Grayscale</ButtonText>
+          </Button>
         </TouchableOpacity>
         <TouchableOpacity onPress={addEffect("blur")}>
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Blur</Text>
-          </View>
+          <Button>
+            <ButtonText>Blur</ButtonText>
+          </Button>
         </TouchableOpacity>
-      </View>
-    </GestureHandlerRootView>
+      </BottomButtonsContainer>
+    </StyledGestureHandlerRootView>
   );
 };
 
 export default withPerformanceModeSettings(ImageEditorScreen);
 
-const styles = StyleSheet.create({
-  container: {
+const StyledGestureHandlerRootView = styled(GestureHandlerRootView)({
+  root: {
     flex: 1,
   },
-  bottomButtons: {
+});
+
+const BottomButtonsContainer = styled(View)({
+  root: {
     position: "absolute",
     bottom: 20,
     left: "50%",
@@ -97,13 +101,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 20,
   },
-  button: {
+});
+
+const Button = styled(View)({
+  root: {
     backgroundColor: "white",
     borderRadius: 5,
     opacity: 0.8,
     padding: 10,
   },
-  buttonText: {
+});
+
+const ButtonText = styled(Text)({
+  root: {
     fontFamily: "Inter Regular",
     fontSize: 18,
     fontWeight: "bold",

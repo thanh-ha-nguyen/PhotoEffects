@@ -1,9 +1,10 @@
 import db from "@/persistence/db";
 import migrations from "@/persistence/drizzle/migrations";
 import { photoEffects, photos } from "@/persistence/schema";
+import styled from "@/utils/styled";
 import { getTableName } from "drizzle-orm";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
-import { Button, StyleSheet, Text } from "react-native";
+import { Button, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsTab() {
@@ -23,24 +24,25 @@ export default function SettingsTab() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>
-        Edit app/(tabs)/settings.tsx to edit this screen.
-      </Text>
+    <StyledSafeAreaView>
+      <StyledText>Edit app/(tabs)/settings.tsx to edit this screen.</StyledText>
       {process.env.EXPO_PUBLIC_ALLOW_DELETE_DB === "yes" && (
         <Button title="Delete database" onPress={handleDeleteDatabase} />
       )}
-    </SafeAreaView>
+    </StyledSafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const StyledSafeAreaView = styled(SafeAreaView)({
+  root: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
-  text: {
+});
+
+const StyledText = styled(Text)({
+  root: {
     marginVertical: "auto",
   },
 });

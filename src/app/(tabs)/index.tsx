@@ -1,6 +1,7 @@
 import withPerformanceModeSettings from "@/components/withPerformanceModeSettings";
 import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
+import styled from "@/utils/styled";
 import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAllPhotos, insertPhotos } from "../../persistence/photos";
@@ -62,51 +64,71 @@ const ImagesListScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
+    <StyledSafeAreaView>
+      <ImageList
         data={images}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
-            <TouchableOpacity style={{ margin: 8 }}>
-              <OpenCVImage source={{ uri: item.uri }} style={styles.image} />
-            </TouchableOpacity>
+            <StyledTouchableOpacity>
+              <Image source={{ uri: item.uri }} />
+            </StyledTouchableOpacity>
           </Link>
         )}
         horizontal={false}
         numColumns={3}
-        style={styles.imageList}
       />
       {images.length === 0 && (
-        <View style={[styles.container, StyleSheet.absoluteFill]}>
-          <Text style={styles.emptyText}>No photos selected.</Text>
-        </View>
+        <Container style={StyleSheet.absoluteFill}>
+          <EmptyText>No photos selected.</EmptyText>
+        </Container>
       )}
       <Button title="Pick Photos from Gallery" onPress={pickImages} />
-    </SafeAreaView>
+    </StyledSafeAreaView>
   );
 };
 
 export default withPerformanceModeSettings(ImagesListScreen);
 
-const styles = StyleSheet.create({
-  container: {
+const ImageList = styled(FlatList<PhotoEntity>)({
+  root: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    width: "100%",
+    padding: 8,
   },
-  image: {
+});
+
+const Image = styled(OpenCVImage)({
+  root: {
     width: 100,
     height: 100,
     borderRadius: 8,
     margin: 8,
   },
-  imageList: {
-    flex: 1,
-    width: "100%",
-    padding: 8,
+});
+
+const containerStyle: ViewStyle = {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const StyledSafeAreaView = styled(SafeAreaView)({
+  root: containerStyle,
+});
+
+const Container = styled(View)({
+  root: containerStyle,
+});
+
+const StyledTouchableOpacity = styled(TouchableOpacity)({
+  root: {
+    margin: 8,
   },
-  emptyText: {
+});
+
+const EmptyText = styled(Text)({
+  root: {
     fontSize: 16,
     color: "#888",
   },
