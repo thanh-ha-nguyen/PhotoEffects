@@ -10,6 +10,7 @@ import {
 } from "@expo-google-fonts/inter";
 import { useFonts } from "@expo-google-fonts/inter/useFonts";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { Text } from "react-native";
@@ -20,6 +21,8 @@ import "expo-sqlite/localStorage/install";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  useDrizzleStudio(db.$client);
+
   const { success: migrationsSuccess, error: migrationError } = useMigrations(
     db,
     migrations,
