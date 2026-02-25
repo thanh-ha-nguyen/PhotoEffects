@@ -1,4 +1,3 @@
-// @ts-ignore
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import resolveAssetSource from "react-native";
 
 export default resolveAssetSource;
