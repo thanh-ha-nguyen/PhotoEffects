@@ -11,6 +11,16 @@ export async function insertPhotos(...values: Photo[]) {
     .returning();
 }
 
+export async function getNextPhotoEffectOrder(photoId: number) {
+  const result = await db
+    .select({ maxOrder: sql`MAX("order")` })
+    .from(photoEffects)
+    .where(eq(photoEffects.photoId, photoId));
+
+  const maxOrder = (result[0]?.maxOrder as number) ?? 0;
+  return maxOrder + 1;
+}
+
 export async function insertPhotoEffectsByPhotoId(
   photoId: number,
   ...values: Omit<PhotoEffect, "photoId">[]
@@ -25,6 +35,10 @@ export async function insertPhotoEffectsByPhotoId(
       })),
     )
     .returning();
+}
+
+export async function deletePhotoEffectById(id: number) {
+  await db.delete(photoEffects).where(eq(photoEffects.id, id));
 }
 
 export async function getAllPhotos() {

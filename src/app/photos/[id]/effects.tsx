@@ -1,5 +1,7 @@
 import { ImageEffects, ImageEffectTypes } from "@/modules/expo-opencv";
 import {
+  deletePhotoEffectById,
+  getNextPhotoEffectOrder,
   getPhotoEffectsByPhotoId,
   insertPhotoEffectsByPhotoId,
 } from "@/persistence/photos";
@@ -8,7 +10,14 @@ import styled from "@/utils/styled";
 import { ListItem } from "@rneui/themed";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Animated from "react-native-reanimated";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -31,11 +40,20 @@ const ImageEffectsEditorScreen = () => {
 
   const addEffect = (effectName: ImageEffectTypes) =>
     async function handleAddEffect() {
+      const nextOrder = await getNextPhotoEffectOrder(Number(id));
       const newEffect = await insertPhotoEffectsByPhotoId(Number(id), {
         effectName,
-        order: (effects ? effects.length : 0) + 1,
+        order: nextOrder,
       });
       setEffects((prev) => [...(prev || []), newEffect[0]]);
+    };
+
+  const removeEffect = (effectId: number) =>
+    async function handleRemoveEffect() {
+      await deletePhotoEffectById(effectId);
+      setEffects((prev) =>
+        prev ? prev.filter((effect) => effect.id !== effectId) : null,
+      );
     };
 
   return (
@@ -46,11 +64,16 @@ const ImageEffectsEditorScreen = () => {
         {effects && effects.length > 0 ? (
           <List>
             {effects?.map((effect, index) => (
-              <ListItem key={effect.id || -index}>
-                <ListItem.Content>
-                  <ListItem.Title>{effect.effectName}</ListItem.Title>
-                </ListItem.Content>
-              </ListItem>
+              <RemovableListItemView key={effect.id || -index}>
+                <DeleteButton onPress={removeEffect(effect.id)}>
+                  <DangerText>Delete</DangerText>
+                </DeleteButton>
+                <ListItem style={{ flex: 1 }}>
+                  <ListItem.Content>
+                    <ListItem.Title>{effect.effectName}</ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              </RemovableListItemView>
             ))}
           </List>
         ) : (
@@ -101,6 +124,21 @@ const EmptyText = styled(Text)({
   },
 });
 
+const DeleteButton = styled(TouchableOpacity)((theme) => ({
+  root: {
+    backgroundColor: theme.colors.error,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+}));
+
+const DangerText = styled(Text)((theme) => ({
+  root: {
+    color: theme.colors.white,
+    padding: 8,
+  },
+}));
+
 const List = styled(View)({
   root: {
     backgroundColor: "#ccc",
@@ -112,5 +150,16 @@ const List = styled(View)({
     gap: 1,
     marginBottom: 24,
     overflow: "hidden",
+  },
+});
+
+const RemovableListItemView = styled(Animated.View)({
+  root: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "stretch",
+    justifyContent: "center",
+    width: "100%",
   },
 });
