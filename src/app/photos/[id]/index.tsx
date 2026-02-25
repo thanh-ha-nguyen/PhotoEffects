@@ -5,12 +5,15 @@ import {
   ImageEffectTypes,
   OpenCVImage,
 } from "@/modules/expo-opencv";
-import { getPhotoById, savePhotoEffectsByPhotoId } from "@/persistence/photos";
+import { getPhotoById } from "@/persistence/photos";
 import styled from "@/utils/styled";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@rneui/themed";
+import { Link, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PhotoEntityWithEffects = typeof getPhotoById extends (
   ...args: any
@@ -18,14 +21,11 @@ type PhotoEntityWithEffects = typeof getPhotoById extends (
   ? R
   : never;
 
-type ImageEffectWithId = Exclude<ImageEffect, ImageEffectTypes> & {
-  id?: number;
-};
-
 const ImageEditorScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [headerTitle, setHeaderTitle] = useState("Loading...");
   const [photo, setPhoto] = useState<PhotoEntityWithEffects | undefined>();
-  const [effects, setEffects] = useState<ImageEffectWithId[]>([]);
   const { id } = useLocalSearchParams<{ id: string }>();
 
   useEffect(() => {
@@ -33,27 +33,9 @@ const ImageEditorScreen: React.FC = () => {
       const photo = await getPhotoById(Number(id));
       setHeaderTitle(photo ? `Photo ${photo.id}` : "Photo not found");
       setPhoto(photo);
-      setEffects(extractImageEffects(photo));
     }
     loadPhotoFromDb();
   }, [id]);
-
-  const addEffect = (effectName: ImageEffectTypes) =>
-    async function handleAddEffect() {
-      if (!photo) return;
-
-      const newEffects = effects.concat({ name: effectName });
-      await savePhotoEffectsByPhotoId(
-        photo.id,
-        newEffects.map((effect, index) => ({
-          order: index,
-          id: effect.id,
-          effectName: effect.name,
-          effectOptions: JSON.stringify(effect.options),
-        })),
-      );
-      setEffects(newEffects);
-    };
 
   return (
     <StyledGestureHandlerRootView style={StyleSheet.absoluteFill}>
@@ -62,23 +44,24 @@ const ImageEditorScreen: React.FC = () => {
         <PanZoomView width={photo.width} height={photo.height}>
           <OpenCVImage
             source={{ uri: photo.uri }}
-            effects={effects}
+            effects={toImageEffects(photo)}
             contentFit="contain"
             style={StyleSheet.absoluteFill}
           />
         </PanZoomView>
       )}
-      <BottomButtonsContainer>
-        <TouchableOpacity onPress={addEffect("grayscale")}>
-          <Button>
-            <ButtonText>Grayscale</ButtonText>
-          </Button>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={addEffect("blur")}>
-          <Button>
-            <ButtonText>Blur</ButtonText>
-          </Button>
-        </TouchableOpacity>
+      <BottomButtonsContainer style={{ bottom: insets.bottom }}>
+        <Link href={`/photos/${id}/effects`} asChild>
+          <TouchableOpacity activeOpacity={0.8}>
+            <Button>
+              <Ionicons
+                name="color-palette"
+                size={30}
+                color={theme.colors.primary}
+              />
+            </Button>
+          </TouchableOpacity>
+        </Link>
       </BottomButtonsContainer>
     </StyledGestureHandlerRootView>
   );
@@ -106,26 +89,15 @@ const BottomButtonsContainer = styled(View)({
 const Button = styled(View)({
   root: {
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius: 9999,
     opacity: 0.8,
     padding: 10,
   },
 });
 
-const ButtonText = styled(Text)({
-  root: {
-    fontFamily: "Inter Regular",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});
-
-function extractImageEffects(
-  photo: PhotoEntityWithEffects,
-): ImageEffectWithId[] {
+function toImageEffects(photo: PhotoEntityWithEffects): ImageEffect[] {
   return (
     photo?.effects.map((effect) => ({
-      id: effect.id,
       name: effect.effectName as ImageEffectTypes,
       options: effect.effectOptions
         ? JSON.parse(effect.effectOptions)
