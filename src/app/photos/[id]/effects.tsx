@@ -1,15 +1,9 @@
-import { ImageEffects, ImageEffectTypes } from "@/modules/expo-opencv";
-import {
-  deletePhotoEffectById,
-  getNextPhotoEffectOrder,
-  getPhotoEffectsByPhotoId,
-  insertPhotoEffectsByPhotoId,
-} from "@/persistence/photos";
-import { PhotoEffectEntity } from "@/persistence/schema";
+import { ImageEffects } from "@/modules/expo-opencv";
+import usePhotoActiveRecord from "@/states/photoActiveRecord";
 import styled from "@/utils/styled";
 import { ListItem } from "@rneui/themed";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -26,46 +20,28 @@ import {
 const ImageEffectsEditorScreen = () => {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [headerTitle, setHeaderTitle] = useState("Loading...");
-  const [effects, setEffects] = useState<PhotoEffectEntity[] | null>(null);
+  const effects = usePhotoActiveRecord((state) => state.photoEffects);
+  const isLoading = usePhotoActiveRecord((state) => state.isLoading);
+  const loadPhotoById = usePhotoActiveRecord((state) => state.loadPhotoById);
+  const addEffect = usePhotoActiveRecord((state) => state.addEffect);
+  const removeEffect = usePhotoActiveRecord((state) => state.removeEffect);
 
   useEffect(() => {
-    async function loadPhotoEffectsFromDb() {
-      const effects = await getPhotoEffectsByPhotoId(Number(id));
-      setEffects(effects);
-      setHeaderTitle("Effects");
-    }
-    loadPhotoEffectsFromDb();
-  }, [id]);
-
-  const addEffect = (effectName: ImageEffectTypes) =>
-    async function handleAddEffect() {
-      const nextOrder = await getNextPhotoEffectOrder(Number(id));
-      const newEffect = await insertPhotoEffectsByPhotoId(Number(id), {
-        effectName,
-        order: nextOrder,
-      });
-      setEffects((prev) => [...(prev || []), newEffect[0]]);
-    };
-
-  const removeEffect = (effectId: number) =>
-    async function handleRemoveEffect() {
-      await deletePhotoEffectById(effectId);
-      setEffects((prev) =>
-        prev ? prev.filter((effect) => effect.id !== effectId) : null,
-      );
-    };
+    loadPhotoById(Number(id));
+  }, [id, loadPhotoById]);
 
   return (
     <SafeAreaView style={StyleSheet.absoluteFill}>
-      <Stack.Screen options={{ headerTitle }} />
+      <Stack.Screen
+        options={{ headerTitle: isLoading ? "Loading..." : "Effects" }}
+      />
       <StyledScrollView style={{ marginTop: -insets.top }}>
         <HeaderText>In-use</HeaderText>
         {effects && effects.length > 0 ? (
           <List>
             {effects?.map((effect, index) => (
               <RemovableListItemView key={effect.id || -index}>
-                <DeleteButton onPress={removeEffect(effect.id)}>
+                <DeleteButton onPress={() => removeEffect(effect.id)}>
                   <DangerText>Delete</DangerText>
                 </DeleteButton>
                 <ListItem style={{ flex: 1 }}>
@@ -82,7 +58,7 @@ const ImageEffectsEditorScreen = () => {
         <HeaderText>Available</HeaderText>
         <List>
           {ImageEffects.map((effect) => (
-            <ListItem key={effect} onPress={addEffect(effect)}>
+            <ListItem key={effect} onPress={() => addEffect(effect)}>
               <ListItem.Content>
                 <ListItem.Title>{effect}</ListItem.Title>
               </ListItem.Content>

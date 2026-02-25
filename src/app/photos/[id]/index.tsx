@@ -5,46 +5,42 @@ import {
   ImageEffectTypes,
   OpenCVImage,
 } from "@/modules/expo-opencv";
-import { getPhotoById } from "@/persistence/photos";
+import { PhotoEffectEntity } from "@/persistence/schema";
+import usePhotoActiveRecord from "@/states/photoActiveRecord";
 import styled from "@/utils/styled";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@rneui/themed";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type PhotoEntityWithEffects = typeof getPhotoById extends (
-  ...args: any
-) => Promise<infer R>
-  ? R
-  : never;
-
 const ImageEditorScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const [headerTitle, setHeaderTitle] = useState("Loading...");
-  const [photo, setPhoto] = useState<PhotoEntityWithEffects | undefined>();
+  const photo = usePhotoActiveRecord((state) => state.photo);
+  const effects = usePhotoActiveRecord((state) => state.photoEffects);
+  const isLoading = usePhotoActiveRecord((state) => state.isLoading);
+  const loadPhotoById = usePhotoActiveRecord((state) => state.loadPhotoById);
   const { id } = useLocalSearchParams<{ id: string }>();
 
   useEffect(() => {
-    async function loadPhotoFromDb() {
-      const photo = await getPhotoById(Number(id));
-      setHeaderTitle(photo ? `Photo ${photo.id}` : "Photo not found");
-      setPhoto(photo);
-    }
-    loadPhotoFromDb();
-  }, [id]);
+    loadPhotoById(Number(id));
+  }, [id, loadPhotoById]);
 
   return (
     <StyledGestureHandlerRootView style={StyleSheet.absoluteFill}>
-      <Stack.Screen options={{ headerTitle }} />
+      <Stack.Screen
+        options={{
+          headerTitle: isLoading ? "Loading..." : `Photo ${photo?.id}`,
+        }}
+      />
       {photo && (
         <PanZoomView width={photo.width} height={photo.height}>
           <OpenCVImage
             source={{ uri: photo.uri }}
-            effects={toImageEffects(photo)}
+            effects={toImageEffects(effects)}
             contentFit="contain"
             style={StyleSheet.absoluteFill}
           />
@@ -95,9 +91,9 @@ const Button = styled(View)({
   },
 });
 
-function toImageEffects(photo: PhotoEntityWithEffects): ImageEffect[] {
+function toImageEffects(effects: PhotoEffectEntity[] | null): ImageEffect[] {
   return (
-    photo?.effects.map((effect) => ({
+    (effects || []).map((effect) => ({
       name: effect.effectName as ImageEffectTypes,
       options: effect.effectOptions
         ? JSON.parse(effect.effectOptions)

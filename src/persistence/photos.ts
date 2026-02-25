@@ -42,14 +42,12 @@ export async function deletePhotoEffectById(id: number) {
 }
 
 export async function getAllPhotos() {
-  return db.select().from(photos).all();
+  return await db.select().from(photos);
 }
 
 export async function getPhotoById(id: number) {
-  return db.query.photos.findFirst({
-    with: { effects: { orderBy: (table) => table.order } },
-    where: eq(photos.id, id),
-  });
+  const rows = await db.select().from(photos).where(eq(photos.id, id));
+  return rows[0] || null;
 }
 
 export async function getPhotoEffectsByPhotoId(photoId: number) {
