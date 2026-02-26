@@ -15,7 +15,7 @@ This project uses a mix of modern web technologies and native mobile code:
 ## Main Features
 *   **High-Performance Editing:** Unlike normal apps that process images in JavaScript (which can be slow), this app uses **OpenCV** on the native side. This makes effects run much faster.
 *   **Custom Image Effects:** Users can apply filters and effects to their photos.
-*   **Native Integration:** The project demonstrates how to include external C++ libraries (`libs/opencv`) and use them inside a React Native app.
+*   **Native Integration:** The project demonstrates how to include external C++ libraries and use them inside a React Native app.
 
 ## Grade Aspiration: 5 (Excellent)
 I am aiming for the maximum grade because this project is technically more advanced than a standard React Native assignment.
