@@ -37,12 +37,15 @@ const ImageEditorScreen: React.FC = () => {
         }}
       />
       {photo && (
-        <PanZoomView width={photo.width} height={photo.height}>
-          <OpenCVImage
+        <PanZoomView>
+          <Image
             source={{ uri: photo.uri }}
             effects={toImageEffects(effects)}
             contentFit="contain"
-            style={StyleSheet.absoluteFill}
+            style={{
+              width: photo.width,
+              height: photo.height,
+            }}
           />
         </PanZoomView>
       )}
@@ -68,6 +71,16 @@ export default withPerformanceModeSettings(ImageEditorScreen);
 const StyledGestureHandlerRootView = styled(GestureHandlerRootView)({
   root: {
     flex: 1,
+    position: "relative",
+  },
+});
+
+const Image = styled(OpenCVImage)({
+  root: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
   },
 });
 

@@ -1,30 +1,14 @@
 import React from "react";
-import { Dimensions, ViewProps } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 
-export interface PanZoomViewProps extends ViewProps {
-  height: number;
-  width: number;
-}
-
-const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
-  children,
-  width,
-  height,
-}) => {
-  const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
-  const viewWidth = useSharedValue(width);
-  const viewHeight = useSharedValue(height);
-  const centerX = useSharedValue(windowWidth / 2);
-  const centerY = useSharedValue(windowHeight / 2);
+const PanZoomView: React.FC<React.PropsWithChildren> = ({ children }) => {
   const focalX = useSharedValue(0);
   const focalY = useSharedValue(0);
   const scale = useSharedValue(1);
-  const scaleBase = useSharedValue(1);
   const originX = useSharedValue(0);
   const originY = useSharedValue(0);
   const translateX = useSharedValue(0);
@@ -51,27 +35,23 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
 
   const composed = Gesture.Simultaneous(pinch, pan);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    position: "absolute",
-    left: "50%",
-    top: "50%",
-    height: viewHeight.value,
-    width: viewWidth.value,
+  const zoomAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    transformOrigin: [focalX.value, focalY.value, 1],
+  }));
+
+  const panAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: -(centerX.value - focalX.value) },
-      { translateY: -(centerY.value - focalY.value) },
-      { scale: scale.value },
-      { translateX: centerX.value - focalX.value },
-      { translateY: centerY.value - focalY.value },
-      { scale: scaleBase.value },
-      { translateX: translateX.value - viewWidth.value / 2 },
-      { translateY: translateY.value - viewHeight.value / 2 },
+      { translateX: translateX.value },
+      { translateY: translateY.value },
     ],
   }));
 
   return (
     <GestureDetector gesture={composed}>
-      <Animated.View style={animatedStyle}>{children}</Animated.View>
+      <Animated.View style={zoomAnimatedStyle}>
+        <Animated.View style={panAnimatedStyle}>{children}</Animated.View>
+      </Animated.View>
     </GestureDetector>
   );
 };
