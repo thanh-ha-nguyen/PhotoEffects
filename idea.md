@@ -5,10 +5,12 @@ This document explains the **Photo Effects** project developed for the React Nat
 
 ## Technologies
 This project uses a mix of modern web technologies and native mobile code:
-*   **React Native (Expo):** Used for building the user interface and managing the application flow.
-*   **OpenCV:** A powerful library written in C++ for computer vision and image analysis. It is included in the `libs/` folder.
-*   **Native Modules:** Custom code used to bridge the gap between JavaScript and the native OpenCV library (indicated by the `modules/` folder structure).
-*   **TypeScript:** Used to write clean and error-free JavaScript code.
+*   **[React Native (Expo):](https://docs.expo.dev/)** Used for building the user interface and managing the application flow.
+*   **[OpenCV:](https://opencv.org/)** A powerful library written in C++ for computer vision and image analysis. It is included in the `libs/` folder.
+*   **[Native Modules (Expo Modules API):](https://docs.expo.dev/modules/overview/)** Custom code used to bridge the gap between JavaScript and the native OpenCV library (indicated by the `modules/` folder structure).
+*   **[Expo SQLite:](https://docs.expo.dev/versions/latest/sdk/sqlite/)** Used for storing data locally on the phone's database.
+*   **[Zustand:](https://zustand.docs.pmnd.rs/learn/getting-started/introduction)** A simple library for managing the application's state.
+*   **[TypeScript:](https://www.typescriptlang.org/)** Used to write clean and error-free JavaScript code.
 
 ## Main Features
 *   **High-Performance Editing:** Unlike normal apps that process images in JavaScript (which can be slow), this app uses **OpenCV** on the native side. This makes effects run much faster.
