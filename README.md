@@ -11,6 +11,7 @@ This project is to develop an application for both iOS and Android which allows 
 * [OpenCV](https://opencv.org/)
 * [Native Modules (Expo Modules API)](https://docs.expo.dev/modules/overview/)
 * [Expo SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/)
+* [Drizzle ORM](https://orm.drizzle.team/)
 * [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction)
 * [TypeScript](https://www.typescriptlang.org/)
 
