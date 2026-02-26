@@ -1,17 +1,12 @@
+import DeleteableListItem from "@/components/DeleteableListItem";
 import { ImageEffects } from "@/modules/expo-opencv";
 import usePhotoActiveRecord from "@/states/photoActiveRecord";
 import styled from "@/utils/styled";
 import { ListItem } from "@rneui/themed";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Animated from "react-native-reanimated";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -31,42 +26,42 @@ const ImageEffectsEditorScreen = () => {
   }, [id, loadPhotoById]);
 
   return (
-    <SafeAreaView style={StyleSheet.absoluteFill}>
-      <Stack.Screen
-        options={{ headerTitle: isLoading ? "Loading..." : "Effects" }}
-      />
-      <StyledScrollView style={{ marginTop: -insets.top }}>
-        <HeaderText>In-use</HeaderText>
-        {effects && effects.length > 0 ? (
-          <List>
-            {effects?.map((effect, index) => (
-              <RemovableListItemView key={effect.id || -index}>
-                <DeleteButton onPress={() => removeEffect(effect.id)}>
-                  <DangerText>Delete</DangerText>
-                </DeleteButton>
-                <ListItem style={{ flex: 1 }}>
+    <GestureHandlerRootView>
+      <SafeAreaView style={StyleSheet.absoluteFill}>
+        <Stack.Screen
+          options={{ headerTitle: isLoading ? "Loading..." : "Effects" }}
+        />
+        <StyledScrollView style={{ marginTop: -insets.top }}>
+          <HeaderText>In-use</HeaderText>
+          {effects && effects.length > 0 ? (
+            <List>
+              {effects?.map((effect, index) => (
+                <DeleteableListItem
+                  key={effect.id || -index}
+                  onDelete={() => removeEffect(effect.id)}
+                >
                   <ListItem.Content>
                     <ListItem.Title>{effect.effectName}</ListItem.Title>
                   </ListItem.Content>
-                </ListItem>
-              </RemovableListItemView>
+                </DeleteableListItem>
+              ))}
+            </List>
+          ) : (
+            <EmptyText>No effects applied to this photo yet.</EmptyText>
+          )}
+          <HeaderText>Available</HeaderText>
+          <List>
+            {ImageEffects.map((effect) => (
+              <ListItem key={effect} onPress={() => addEffect(effect)}>
+                <ListItem.Content>
+                  <ListItem.Title>{effect}</ListItem.Title>
+                </ListItem.Content>
+              </ListItem>
             ))}
           </List>
-        ) : (
-          <EmptyText>No effects applied to this photo yet.</EmptyText>
-        )}
-        <HeaderText>Available</HeaderText>
-        <List>
-          {ImageEffects.map((effect) => (
-            <ListItem key={effect} onPress={() => addEffect(effect)}>
-              <ListItem.Content>
-                <ListItem.Title>{effect}</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </List>
-      </StyledScrollView>
-    </SafeAreaView>
+        </StyledScrollView>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 
@@ -100,21 +95,6 @@ const EmptyText = styled(Text)({
   },
 });
 
-const DeleteButton = styled(TouchableOpacity)((theme) => ({
-  root: {
-    backgroundColor: theme.colors.error,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-}));
-
-const DangerText = styled(Text)((theme) => ({
-  root: {
-    color: theme.colors.white,
-    padding: 8,
-  },
-}));
-
 const List = styled(View)({
   root: {
     backgroundColor: "#ccc",
@@ -126,16 +106,5 @@ const List = styled(View)({
     gap: 1,
     marginBottom: 24,
     overflow: "hidden",
-  },
-});
-
-const RemovableListItemView = styled(Animated.View)({
-  root: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "stretch",
-    justifyContent: "center",
-    width: "100%",
   },
 });
