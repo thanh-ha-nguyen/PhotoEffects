@@ -38,7 +38,7 @@ const ImageEditorScreen: React.FC = () => {
       />
       {photo && (
         <PanZoomView>
-          <Image
+          <OpenCVImage
             source={{ uri: photo.uri }}
             effects={toImageEffects(effects)}
             contentFit="contain"
@@ -72,15 +72,8 @@ const StyledGestureHandlerRootView = styled(GestureHandlerRootView)({
   root: {
     flex: 1,
     position: "relative",
-  },
-});
-
-const Image = styled(OpenCVImage)({
-  root: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
