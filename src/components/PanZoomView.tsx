@@ -73,8 +73,6 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
   // Store the current position (X and Y)
   const x = useSharedValue(0);
   const y = useSharedValue(0);
-  const _x = useSharedValue(x.value);
-  const _y = useSharedValue(y.value);
 
   // --- NEW VARIABLES (Proposed) ---
   // Separate translation components to avoid conflicts
@@ -98,8 +96,8 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
     const maxY = Math.max(0, (ch - sh) / 2);
 
     // Calculate final proposed position based on all components
-    const currentX = _x.value + tx.value + zx.value;
-    const currentY = _y.value + ty.value + zy.value;
+    const currentX = x.value + tx.value + zx.value;
+    const currentY = y.value + ty.value + zy.value;
 
     // Spring back if out of bounds
     const targetX = Math.min(Math.max(currentX, -maxX), maxX);
@@ -107,8 +105,8 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
 
     // Update state to current position before animating to target
     // This prevents the image from jumping back to 0 when tx/ty are reset
-    _x.value = currentX;
-    _y.value = currentY;
+    x.value = currentX;
+    y.value = currentY;
 
     // Reset temporary gesture values
     tx.value = 0;
@@ -117,8 +115,8 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
     zy.value = 0;
 
     // Commit values
-    _x.value = withSpring(targetX);
-    _y.value = withSpring(targetY);
+    x.value = withSpring(targetX);
+    y.value = withSpring(targetY);
   };
 
   // --- GESTURES LOGIC ---
@@ -135,8 +133,8 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
 
       // Correct the focal point by removing the active pan (tx,ty) and committed pan (_x,_y)
       // This ensures we zoom into the correct point on the image
-      zx.value = (1 - e.scale) * (e.focalX - tx.value - centerX - _x.value);
-      zy.value = (1 - e.scale) * (e.focalY - ty.value - centerY - _y.value);
+      zx.value = (1 - e.scale) * (e.focalX - tx.value - centerX - x.value);
+      zy.value = (1 - e.scale) * (e.focalY - ty.value - centerY - y.value);
     })
     .onEnd(() => {
       // Calculate dynamic min scale to fit the screen content (Content Fit)
@@ -179,8 +177,8 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
       // Animate back to original position and size
       s.value = withSpring(1);
       _s.value = 1;
-      _x.value = withSpring(0);
-      _y.value = withSpring(0);
+      x.value = withSpring(0);
+      y.value = withSpring(0);
 
       // Reset all position components
       tx.value = 0;
@@ -201,8 +199,8 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       // Combine all translation components
-      { translateX: _x.value + tx.value + zx.value },
-      { translateY: _y.value + ty.value + zy.value },
+      { translateX: x.value + tx.value + zx.value },
+      { translateY: y.value + ty.value + zy.value },
       { scale: s.value },
     ],
   }));
