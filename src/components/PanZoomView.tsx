@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, type ViewProps } from "react-native";
+import { useWindowDimensions, type ViewProps } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -26,6 +26,29 @@ interface PanZoomViewProps extends ViewProps {
   maxScale?: number;
 }
 
+/**
+ * A pan and zoom view component for React Native that allows users to interact with content
+ * through pinch-to-zoom, panning, and double-tap-to-reset gestures.
+ *
+ * The component manages complex animation state with separate translation and zoom components
+ * to handle smooth interactions and prevent visual artifacts. It automatically constrains
+ * content within boundaries based on the current zoom level and screen dimensions.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <PanZoomView minScale={0.5} maxScale={5}>
+ *   <Image source={{ uri: 'https://example.com/image.jpg' }} />
+ * </PanZoomView>
+ * ```
+ *
+ * @remarks
+ * - Supports simultaneous pinch, pan, and double-tap gestures
+ * - Automatically springs content back into bounds when released
+ * - Uses separate state components (tx, ty, zx, zy) to maintain proper focal points during zoom
+ * - Respects screen dimensions for boundary calculations using useWindowDimensions hook
+ * - Double-tap resets the image to its initial scale and position with spring animation
+ */
 const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
   minScale = 0.5,
   maxScale = 5,
@@ -34,7 +57,9 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
   ...props
 }) => {
   // Get screen dimensions to calculate boundaries relative to the viewport
-  const { width: sw, height: sh } = Dimensions.get("window");
+  // Use useWindowDimensions() hook instead of Dimensions.get("window") so that
+  // the calculation is updated accordingly.
+  const { width: sw, height: sh } = useWindowDimensions();
 
   // --- SHARED VALUES (State management) ---
   // Store the dimensions of the container to calculate focal points and boundaries
@@ -114,10 +139,18 @@ const PanZoomView: React.FC<React.PropsWithChildren<PanZoomViewProps>> = ({
       zy.value = (1 - e.scale) * (e.focalY - ty.value - centerY - _y.value);
     })
     .onEnd(() => {
-      // Clamp scale to defined minimum and maximum boundaries
-      if (s.value < minScale) {
-        s.value = withSpring(minScale);
-        _s.value = minScale;
+      // Calculate dynamic min scale to fit the screen content (Content Fit)
+      // This ensures the image doesn't scale smaller than the screen dimensions
+      let mins = minScale;
+      if (w.value > 0 && h.value > 0) {
+        // Cap at 1 to avoid forcing zoom-in if the image is smaller than the screen
+        mins = Math.min(1, Math.min(sw / w.value, sh / h.value));
+      }
+
+      // Clamp scale to calculated minimum and maximum boundaries
+      if (s.value < mins) {
+        s.value = withSpring(mins);
+        _s.value = mins;
       } else if (s.value > maxScale) {
         s.value = withSpring(maxScale);
         _s.value = maxScale;
