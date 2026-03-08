@@ -1,4 +1,5 @@
 import { useTheme } from "@rneui/themed";
+import React from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 type RootStyle = {
@@ -6,30 +7,38 @@ type RootStyle = {
 };
 
 const styled =
-  <P extends object>(Component: React.ComponentType<P>) =>
+  <C extends React.ElementType>(Component: C) =>
   <
     T extends
       | RootStyle
-      | ((theme: ReturnType<typeof useTheme>["theme"], props?: P) => RootStyle),
+      | ((
+          theme: ReturnType<typeof useTheme>["theme"],
+          props: React.ComponentProps<C>,
+        ) => RootStyle),
   >(
     styles: T,
   ) => {
-    return function StyledComponent({
-      style: overridenStyle,
-      ...props
-    }: P & { style?: StyleProp<ViewStyle | ImageStyle | TextStyle> }) {
+    const StyledComponent: React.FC<
+      React.ComponentProps<C> & {
+        style?: StyleProp<ViewStyle | ImageStyle | TextStyle>;
+      }
+    > = ({ style: overridenStyle, ...props }) => {
       const { theme } = useTheme();
       const computedStyle =
         typeof styles === "function"
-          ? styles(theme, props as P)
+          ? styles(theme, props as React.ComponentProps<C>)
           : (styles as RootStyle);
       return (
         <Component
-          style={[computedStyle?.root || {}, overridenStyle]}
-          {...(props as P)}
+          {...({
+            ...props,
+            style: [computedStyle?.root || {}, overridenStyle],
+          } as React.ComponentProps<C>)}
         />
       );
     };
+    StyledComponent.displayName = `Styled(${(Component as any).displayName || (Component as any).name || "Component"})`;
+    return StyledComponent;
   };
 
 export default styled;

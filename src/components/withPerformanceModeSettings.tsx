@@ -1,4 +1,4 @@
-import { isResourceIntensiveMode } from "@/persistence/settings";
+import useSettings from "@/states/settings";
 import { useIsFocused } from "@react-navigation/native";
 import React from "react";
 
@@ -7,7 +7,10 @@ const withPerformanceModeSettings = <P extends object>(
 ) => {
   return function PerformanceModeHOC(props: P) {
     const isFocused = useIsFocused();
-    if (!isFocused && isResourceIntensiveMode()) {
+    const isPerformanceMode =
+      "performance" === useSettings((state) => state.performanceMode);
+
+    if (!isFocused && !isPerformanceMode) {
       // Don't render the component when it's not focused to save resources
       return null;
     }

@@ -1,48 +1,60 @@
-import db from "@/persistence/db";
-import migrations from "@/persistence/drizzle/migrations";
-import { photoEffects, photos } from "@/persistence/schema";
+import ListItemSwitchInput from "@/components/ListItemSwitchInput";
+import useSettings from "@/states/settings";
 import styled from "@/utils/styled";
-import { getTableName } from "drizzle-orm";
-import { migrate } from "drizzle-orm/expo-sqlite/migrator";
-import { Button, Text } from "react-native";
+import { ListItem } from "@rneui/themed";
+import React from "react";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function SettingsTab() {
-  const handleDeleteDatabase = async () => {
-    db.run(`DROP TABLE IF EXISTS "__drizzle_migrations"`);
-    db.run(`DROP TABLE IF EXISTS "${getTableName(photoEffects)}"`);
-    db.run(`DROP TABLE IF EXISTS "${getTableName(photos)}"`);
-
-    try {
-      await db.transaction(async (tx) => {
-        await migrate(tx, migrations);
-      });
-      console.log("Migrations ran successfully after deleting database.");
-    } catch (error) {
-      console.error("Failed to run migrations after deleting database:", error);
-    }
-  };
+const SettingsTab: React.FC = () => {
+  const performanceMode = useSettings((state) => state.performanceMode);
+  const setPerformanceMode = useSettings((state) => state.setPerformanceMode);
 
   return (
     <StyledSafeAreaView>
-      <StyledText>Edit app/(tabs)/settings.tsx to edit this screen.</StyledText>
-      {process.env.EXPO_PUBLIC_ALLOW_DELETE_DB === "yes" && (
-        <Button title="Delete database" onPress={handleDeleteDatabase} />
-      )}
+      <ScrollView>
+        <ListItem>
+          <ListItem.Content>
+            <ListItem.Title>General</ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+        <Container>
+          <ListItemSwitchInput
+            inputProps={{
+              value: performanceMode === "performance",
+              onValueChange: (value) => {
+                setPerformanceMode(
+                  value ? "performance" : "resource-intensive",
+                );
+              },
+            }}
+            label={"Performace"}
+            helperText="Turn off performance mode to reduce memory consumed."
+          />
+        </Container>
+      </ScrollView>
     </StyledSafeAreaView>
   );
-}
+};
 
-const StyledSafeAreaView = styled(SafeAreaView)({
+export default SettingsTab;
+
+const Container = styled(View)((theme) => ({
+  root: {
+    backgroundColor: theme.colors.white,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 16,
+    marginHorizontal: 4,
+    padding: 8,
+    overflow: "hidden",
+  },
+}));
+
+const StyledSafeAreaView = styled(SafeAreaView)((theme) => ({
   root: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 8,
+    backgroundColor: theme.colors.background,
   },
-});
-
-const StyledText = styled(Text)({
-  root: {
-    marginVertical: "auto",
-  },
-});
+}));

@@ -17,8 +17,6 @@ import { useEffect } from "react";
 import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import "expo-sqlite/localStorage/install";
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
