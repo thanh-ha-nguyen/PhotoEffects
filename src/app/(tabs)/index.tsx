@@ -7,6 +7,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -17,7 +18,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@rneui/themed";
-import { getAllPhotos, insertPhotos } from "../../persistence/photos";
+import { deletePhotoById, getAllPhotos, insertPhotos } from "../../persistence/photos";
 
 const ImagesListScreen: React.FC = () => {
   const [images, setImages] = useState<PhotoEntity[]>([]);
@@ -75,6 +76,24 @@ const ImagesListScreen: React.FC = () => {
     }
   };
 
+  const handleLongPress = (id: number) => {
+    Alert.alert(
+      "Delete Photo",
+      "Are you sure you want to delete this photo?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deletePhotoById(id);
+            setImages((current) => current.filter((p) => p.id !== id));
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <StyledSafeAreaView>
       <ImageList
@@ -82,7 +101,7 @@ const ImagesListScreen: React.FC = () => {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
-            <StyledTouchableOpacity>
+            <StyledTouchableOpacity onLongPress={() => handleLongPress(item.id)}>
               <Image source={{ uri: item.uri }} />
             </StyledTouchableOpacity>
           </Link>
