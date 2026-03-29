@@ -18,6 +18,7 @@ This project uses a mix of modern web technologies and native mobile code:
 *   **Custom Image Effects:** Users can apply filters and effects to their photos.
 *   **Native Integration:** The project demonstrates how to include external C++ libraries and use them inside a React Native app.
 *   **Gesture Support:** The app includes support for intuitive gestures, such as pinch-to-zoom and panning, to enhance user interaction with photos.
+*   **Photo Sharing:** Users can quickly capture and share their edited photos directly from the app. It uses the phone's built-in share feature and saves files to the local memory.
 
 ## Grade Aspiration: 5 (Excellent)
 I am aiming for the maximum grade because this project is technically more advanced than a standard React Native assignment.

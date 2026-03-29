@@ -14,6 +14,9 @@ This project is to develop an application for both iOS and Android which allows 
 * [Drizzle ORM](https://orm.drizzle.team/)
 * [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction)
 * [TypeScript](https://www.typescriptlang.org/)
+* [React Native View Shot](https://github.com/gre/react-native-view-shot)
+* [Expo Sharing](https://docs.expo.dev/versions/latest/sdk/sharing/)
+* [Expo File System](https://docs.expo.dev/versions/latest/sdk/filesystem/)
 
 ## Get started
 
