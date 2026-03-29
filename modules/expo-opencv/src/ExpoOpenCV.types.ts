@@ -895,6 +895,7 @@ export const ImageEffects = [
   // Add more effects here in the future
   "blur",
   "grayscale",
+  "dilate",
 ] as const;
 export type ImageEffectTypes = (typeof ImageEffects)[number];
 type BlurEffect = {
@@ -908,5 +909,16 @@ type BlurEffect = {
   };
 };
 type GrayscaleEffect = { name: "grayscale"; options?: null };
+type DilateEffect = {
+  name: "dilate";
+  options?: {
+    anchorPointX?: number;
+    anchorPointY?: number;
+    borderType?: BorderTypes;
+    ksizeWidth?: number;
+    ksizeHeight?: number;
+    iterations?: number;
+  };
+};
 export type ImageEffect = // Add more effects here in the future
-  ImageEffectTypes | GrayscaleEffect | BlurEffect;
+  ImageEffectTypes | GrayscaleEffect | BlurEffect | DilateEffect;
