@@ -7,12 +7,13 @@ import {
 } from "@/modules/expo-opencv";
 import { PhotoEffectEntity } from "@/persistence/schema";
 import usePhotoActiveRecord from "@/states/photoActiveRecord";
+import { deletePhotoById } from "@/persistence/photos";
 import styled from "@/utils/styled";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@rneui/themed";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -24,6 +25,21 @@ const ImageEditorScreen: React.FC = () => {
   const isLoading = usePhotoActiveRecord((state) => state.isLoading);
   const loadPhotoById = usePhotoActiveRecord((state) => state.loadPhotoById);
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+
+  const handleDelete = () => {
+    Alert.alert("Delete Photo", "Are you sure you want to delete this photo?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await deletePhotoById(Number(id));
+          router.navigate("/");
+        },
+      },
+    ]);
+  };
 
   useEffect(() => {
     loadPhotoById(Number(id));
@@ -61,6 +77,15 @@ const ImageEditorScreen: React.FC = () => {
             </Button>
           </TouchableOpacity>
         </Link>
+        <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
+          <Button>
+            <Ionicons
+              name="trash"
+              size={30}
+              color={theme.colors.error}
+            />
+          </Button>
+        </TouchableOpacity>
       </BottomButtonsContainer>
     </StyledGestureHandlerRootView>
   );

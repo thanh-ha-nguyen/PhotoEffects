@@ -56,3 +56,7 @@ export async function getPhotoEffectsByPhotoId(photoId: number) {
     .from(photoEffects)
     .where(eq(photoEffects.photoId, photoId));
 }
+
+export async function deletePhotoById(id: number) {
+  await db.delete(photos).where(eq(photos.id, id));
+}

@@ -3,8 +3,9 @@ import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
 import styled from "@/utils/styled";
 import * as ImagePicker from "expo-image-picker";
+import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -23,17 +24,25 @@ const ImagesListScreen: React.FC = () => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
-  // Load images from DB on mount
-  useEffect(() => {
-    async function loadPhotosFromDb() {
-      const photos = await getAllPhotos();
-      if (photos && photos.length > 0) {
-        setImages(photos);
-      }
-    }
+  // Safely load images from DB on focus
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-    loadPhotosFromDb();
-  }, []);
+      async function loadPhotosFromDb() {
+        const photos = await getAllPhotos();
+        if (isActive) {
+          setImages(photos || []);
+        }
+      }
+
+      loadPhotosFromDb();
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
   const pickImages = async () => {
     // Ask for permission
