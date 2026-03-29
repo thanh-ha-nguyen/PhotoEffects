@@ -6,7 +6,6 @@ import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  Button,
   FlatList,
   StyleSheet,
   Text,
@@ -14,11 +13,15 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@rneui/themed";
 import { getAllPhotos, insertPhotos } from "../../persistence/photos";
 
 const ImagesListScreen: React.FC = () => {
   const [images, setImages] = useState<PhotoEntity[]>([]);
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   // Load images from DB on mount
   useEffect(() => {
@@ -83,7 +86,13 @@ const ImagesListScreen: React.FC = () => {
           <EmptyText>No photos selected.</EmptyText>
         </Container>
       )}
-      <Button title="Pick Photos from Gallery" onPress={pickImages} />
+      <FloatingButtonContainer style={{ bottom: (insets.bottom || 0) + 20 }}>
+        <TouchableOpacity activeOpacity={0.8} onPress={pickImages}>
+          <FloatingButton>
+            <Ionicons name="images" size={30} color={theme.colors.primary} />
+          </FloatingButton>
+        </TouchableOpacity>
+      </FloatingButtonContainer>
     </StyledSafeAreaView>
   );
 };
@@ -131,5 +140,30 @@ const EmptyText = styled(Text)({
   root: {
     fontSize: 16,
     color: "#888",
+  },
+});
+
+const FloatingButtonContainer = styled(View)({
+  root: {
+    position: "absolute",
+    bottom: 20,
+    left: "50%",
+    transform: [{ translateX: "-50%" }],
+    flexDirection: "row",
+    gap: 20,
+  },
+});
+
+const FloatingButton = styled(View)({
+  root: {
+    backgroundColor: "white",
+    borderRadius: 9999,
+    opacity: 0.8,
+    padding: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
