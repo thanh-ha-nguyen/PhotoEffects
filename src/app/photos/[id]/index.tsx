@@ -5,17 +5,19 @@ import {
   ImageEffectTypes,
   OpenCVImage,
 } from "@/modules/expo-opencv";
+import { deletePhotoById } from "@/persistence/photos";
 import { PhotoEffectEntity } from "@/persistence/schema";
 import usePhotoActiveRecord from "@/states/photoActiveRecord";
-import { deletePhotoById } from "@/persistence/photos";
 import styled from "@/utils/styled";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@rneui/themed";
 import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import React, { useEffect } from "react";
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ViewShot from "react-native-view-shot";
 
 const ImageEditorScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -26,6 +28,20 @@ const ImageEditorScreen: React.FC = () => {
   const loadPhotoById = usePhotoActiveRecord((state) => state.loadPhotoById);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const offscreenViewShotRef = React.useRef<ViewShot>(null);
+
+  const handleShare = async () => {
+    if (photo && offscreenViewShotRef.current && offscreenViewShotRef.current.capture) {
+      try {
+        const uri = await offscreenViewShotRef.current.capture();
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri);
+        }
+      } catch (err) {
+        Alert.alert("Capture Error Details", String(err));
+      }
+    }
+  };
 
   const handleDelete = () => {
     Alert.alert("Delete Photo", "Are you sure you want to delete this photo?", [
@@ -53,6 +69,23 @@ const ImageEditorScreen: React.FC = () => {
         }}
       />
       {photo && (
+        <View style={{ position: "absolute", transform: [{ translateX: -10000 }] }} pointerEvents="none">
+          <ViewShot ref={offscreenViewShotRef} options={{ format: "jpg", quality: 1.0 }}>
+            <View collapsable={false}>
+              <OpenCVImage
+                source={{ uri: photo.uri }}
+                effects={toImageEffects(effects)}
+                contentFit="fill"
+                style={{
+                  width: photo.width * Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                  height: photo.height * Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                }}
+              />
+            </View>
+          </ViewShot>
+        </View>
+      )}
+      {photo && (
         <PanZoomView>
           <OpenCVImage
             source={{ uri: photo.uri }}
@@ -77,6 +110,11 @@ const ImageEditorScreen: React.FC = () => {
             </Button>
           </TouchableOpacity>
         </Link>
+        <TouchableOpacity activeOpacity={0.8} onPress={handleShare}>
+          <Button>
+            <Ionicons name="share-outline" size={30} color={theme.colors.primary} />
+          </Button>
+        </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
           <Button>
             <Ionicons

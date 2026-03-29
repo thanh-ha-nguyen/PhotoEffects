@@ -7,6 +7,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  ActionSheetIOS,
   Alert,
   FlatList,
   StyleSheet,
@@ -17,6 +18,8 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system/legacy";
 import { useTheme } from "@rneui/themed";
 import { deletePhotoById, getAllPhotos, insertPhotos } from "../../persistence/photos";
 
@@ -76,21 +79,47 @@ const ImagesListScreen: React.FC = () => {
     }
   };
 
-  const handleLongPress = (id: number) => {
-    Alert.alert(
-      "Delete Photo",
-      "Are you sure you want to delete this photo?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await deletePhotoById(id);
-            setImages((current) => current.filter((p) => p.id !== id));
-          },
-        },
-      ]
+  const handleLongPress = (photo: PhotoEntity) => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ["Cancel", "Share Photo", "Delete Photo"],
+        destructiveButtonIndex: 2,
+        cancelButtonIndex: 0,
+      },
+      async (buttonIndex) => {
+        if (buttonIndex === 1) {
+          // Share
+          if (await Sharing.isAvailableAsync()) {
+            try {
+              const safeUri = FileSystem.cacheDirectory + "share_" + photo.id + ".jpg";
+              await FileSystem.copyAsync({
+                from: photo.uri,
+                to: safeUri,
+              });
+              await Sharing.shareAsync(safeUri);
+            } catch (err) {
+              Alert.alert("Error", "Could not prepare photo for sharing.");
+            }
+          }
+        } else if (buttonIndex === 2) {
+          // Delete
+          Alert.alert(
+            "Delete Photo",
+            "Are you sure you want to delete this photo?",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: async () => {
+                  await deletePhotoById(photo.id);
+                  setImages((current) => current.filter((p) => p.id !== photo.id));
+                },
+              },
+            ]
+          );
+        }
+      }
     );
   };
 
@@ -101,7 +130,7 @@ const ImagesListScreen: React.FC = () => {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
-            <StyledTouchableOpacity onLongPress={() => handleLongPress(item.id)}>
+            <StyledTouchableOpacity onLongPress={() => handleLongPress(item)}>
               <Image source={{ uri: item.uri }} />
             </StyledTouchableOpacity>
           </Link>
