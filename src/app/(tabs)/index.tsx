@@ -2,9 +2,13 @@ import withPerformanceModeSettings from "@/components/withPerformanceModeSetting
 import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
 import styled from "@/utils/styled";
-import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "@rneui/themed";
+import * as FileSystem from "expo-file-system/legacy";
+import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
+import * as Sharing from "expo-sharing";
 import { useCallback, useState } from "react";
 import {
   ActionSheetIOS,
@@ -16,12 +20,15 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import * as Sharing from "expo-sharing";
-import * as FileSystem from "expo-file-system/legacy";
-import { useTheme } from "@rneui/themed";
-import { deletePhotoById, getAllPhotos, insertPhotos } from "../../persistence/photos";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import {
+  deletePhotoById,
+  getAllPhotos,
+  insertPhotos,
+} from "../../persistence/photos";
 
 const ImagesListScreen: React.FC = () => {
   const [images, setImages] = useState<PhotoEntity[]>([]);
@@ -45,7 +52,7 @@ const ImagesListScreen: React.FC = () => {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, []),
   );
 
   const pickImages = async () => {
@@ -91,13 +98,15 @@ const ImagesListScreen: React.FC = () => {
           // Share
           if (await Sharing.isAvailableAsync()) {
             try {
-              const safeUri = FileSystem.cacheDirectory + "share_" + photo.id + ".jpg";
+              const safeUri =
+                FileSystem.cacheDirectory + "share_" + photo.id + ".jpg";
               await FileSystem.copyAsync({
                 from: photo.uri,
                 to: safeUri,
               });
               await Sharing.shareAsync(safeUri);
             } catch (err) {
+              console.error("Error sharing photo", err);
               Alert.alert("Error", "Could not prepare photo for sharing.");
             }
           }
@@ -113,13 +122,15 @@ const ImagesListScreen: React.FC = () => {
                 style: "destructive",
                 onPress: async () => {
                   await deletePhotoById(photo.id);
-                  setImages((current) => current.filter((p) => p.id !== photo.id));
+                  setImages((current) =>
+                    current.filter((p) => p.id !== photo.id),
+                  );
                 },
               },
-            ]
+            ],
           );
         }
-      }
+      },
     );
   };
 

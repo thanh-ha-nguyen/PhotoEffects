@@ -31,7 +31,11 @@ const ImageEditorScreen: React.FC = () => {
   const offscreenViewShotRef = React.useRef<ViewShot>(null);
 
   const handleShare = async () => {
-    if (photo && offscreenViewShotRef.current && offscreenViewShotRef.current.capture) {
+    if (
+      photo &&
+      offscreenViewShotRef.current &&
+      offscreenViewShotRef.current.capture
+    ) {
       try {
         const uri = await offscreenViewShotRef.current.capture();
         if (await Sharing.isAvailableAsync()) {
@@ -69,16 +73,26 @@ const ImageEditorScreen: React.FC = () => {
         }}
       />
       {photo && (
-        <View style={{ position: "absolute", transform: [{ translateX: -10000 }] }} pointerEvents="none">
-          <ViewShot ref={offscreenViewShotRef} options={{ format: "jpg", quality: 1.0 }}>
+        <View
+          style={{ position: "absolute", transform: [{ translateX: -10000 }] }}
+          pointerEvents="none"
+        >
+          <ViewShot
+            ref={offscreenViewShotRef}
+            options={{ format: "jpg", quality: 1.0 }}
+          >
             <View collapsable={false}>
               <OpenCVImage
                 source={{ uri: photo.uri }}
                 effects={toImageEffects(effects)}
                 contentFit="fill"
                 style={{
-                  width: photo.width * Math.min(1, 2048 / Math.max(photo.width, photo.height)),
-                  height: photo.height * Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                  width:
+                    photo.width *
+                    Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                  height:
+                    photo.height *
+                    Math.min(1, 2048 / Math.max(photo.width, photo.height)),
                 }}
               />
             </View>
@@ -98,33 +112,33 @@ const ImageEditorScreen: React.FC = () => {
           />
         </PanZoomView>
       )}
-      <BottomButtonsContainer style={{ bottom: insets.bottom }}>
+      <FloatingButtonContainer style={{ bottom: insets.bottom }}>
         <Link href={`/photos/${id}/effects`} asChild>
           <TouchableOpacity activeOpacity={0.8}>
-            <Button>
+            <FloatingButton>
               <Ionicons
                 name="color-palette"
                 size={30}
                 color={theme.colors.primary}
               />
-            </Button>
+            </FloatingButton>
           </TouchableOpacity>
         </Link>
         <TouchableOpacity activeOpacity={0.8} onPress={handleShare}>
-          <Button>
-            <Ionicons name="share-outline" size={30} color={theme.colors.primary} />
-          </Button>
+          <FloatingButton>
+            <Ionicons
+              name="share-outline"
+              size={30}
+              color={theme.colors.primary}
+            />
+          </FloatingButton>
         </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
-          <Button>
-            <Ionicons
-              name="trash"
-              size={30}
-              color={theme.colors.error}
-            />
-          </Button>
+          <FloatingButton>
+            <Ionicons name="trash" size={30} color={theme.colors.error} />
+          </FloatingButton>
         </TouchableOpacity>
-      </BottomButtonsContainer>
+      </FloatingButtonContainer>
     </StyledGestureHandlerRootView>
   );
 };
@@ -140,7 +154,7 @@ const StyledGestureHandlerRootView = styled(GestureHandlerRootView)({
   },
 });
 
-const BottomButtonsContainer = styled(View)({
+const FloatingButtonContainer = styled(View)({
   root: {
     position: "absolute",
     bottom: 20,
@@ -151,12 +165,17 @@ const BottomButtonsContainer = styled(View)({
   },
 });
 
-const Button = styled(View)({
+const FloatingButton = styled(View)({
   root: {
     backgroundColor: "white",
     borderRadius: 9999,
     opacity: 0.8,
     padding: 10,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 
