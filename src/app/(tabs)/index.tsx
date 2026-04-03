@@ -86,6 +86,44 @@ const ImagesListScreen: React.FC = () => {
     }
   };
 
+  const takePhoto = async () => {
+    // Ask for camera permission
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera permissions to take photos!");
+      return;
+    }
+
+    try {
+      // Open camera to take a photo
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        const asset = result.assets[0];
+        const newPhoto = {
+          uri: asset.uri,
+          mimeType: asset.mimeType || null,
+          width: asset.width,
+          height: asset.height,
+        };
+
+        // Save the captured photo to DB
+        const savedPhotos = await insertPhotos(newPhoto);
+        setImages((current) => [...current, ...savedPhotos]);
+      }
+    } catch (error) {
+      // Camera is not available on simulators
+      console.error("Error launching camera:", error);
+      Alert.alert(
+        "Camera Unavailable",
+        "The camera is not available on this device. Please use a physical device to take photos.",
+      );
+    }
+  };
+
   const handleLongPress = (photo: PhotoEntity) => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -155,6 +193,11 @@ const ImagesListScreen: React.FC = () => {
         </Container>
       )}
       <FloatingButtonContainer style={{ bottom: (insets.bottom || 0) + 20 }}>
+        <TouchableOpacity activeOpacity={0.8} onPress={takePhoto}>
+          <FloatingButton>
+            <Ionicons name="camera" size={30} color={theme.colors.primary} />
+          </FloatingButton>
+        </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.8} onPress={pickImages}>
           <FloatingButton>
             <Ionicons name="images" size={30} color={theme.colors.primary} />
