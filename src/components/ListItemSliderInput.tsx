@@ -1,64 +1,55 @@
-import styled from "@/utils/styled";
-import Slider, { type SliderProps } from "@react-native-community/slider";
-import type { ListItemSubtitleProps, ListItemTitleProps } from "@rneui/base";
-import { ListItem, type ListItemProps } from "@rneui/themed";
+import { HStack, Slider, Text, VStack } from "@/components/ui";
 import React from "react";
-import { type TextProps, View, type ViewStyle } from "react-native";
+import { ViewStyle } from "react-native";
 
-export interface ListItemSliderInputProps extends ListItemProps {
+export interface ListItemSliderInputProps {
   helperText?: string;
-  helperTextProps?: ListItemSubtitleProps;
-  inputProps?: Omit<SliderProps, "ref">;
+  inputProps?: {
+    value: number;
+    onValueChange: (value: number) => void;
+    min?: number;
+    max?: number;
+    step?: number;
+  };
   inputStyle?: ViewStyle;
   label?: string;
-  labelProps?: ListItemTitleProps;
   showValueLabel?: boolean;
   valueLabelFormat?: (value: number) => string;
-  valueLabelProps?: TextProps;
 }
 
-const ListItemInput: React.FC<ListItemSliderInputProps> = ({
+const ListItemSliderInput: React.FC<ListItemSliderInputProps> = ({
   helperText,
-  helperTextProps,
   inputProps,
   inputStyle,
   label,
-  labelProps,
   showValueLabel,
   valueLabelFormat = (value: number) => String(value),
-  valueLabelProps,
-  ...props
 }) => (
-  <ListItem {...props}>
-    <ListItemContent>
-      <Container></Container>
-      {label && <ListItem.Title {...labelProps}>{label}</ListItem.Title>}
-      <StyledSlider {...inputProps} />
-      {helperText && (
-        <ListItem.Subtitle {...helperTextProps}>{helperText}</ListItem.Subtitle>
+  <VStack style={{ paddingVertical: 10 }}>
+    <HStack style={{ justifyContent: "space-between", marginBottom: 8 }}>
+      {label && <Text style={{ fontSize: 17, fontWeight: "500" }}>{label}</Text>}
+      {showValueLabel && inputProps && (
+        <Text style={{ fontSize: 15, color: "#007AFF" }}>
+          {valueLabelFormat(inputProps.value)}
+        </Text>
       )}
-    </ListItemContent>
-  </ListItem>
+    </HStack>
+    {inputProps && (
+      <Slider
+        value={inputProps.value}
+        onValueChange={inputProps.onValueChange}
+        min={inputProps.min}
+        max={inputProps.max}
+        step={inputProps.step}
+        style={[{ height: 40 }, inputStyle]}
+      />
+    )}
+    {helperText && (
+      <Text style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
+        {helperText}
+      </Text>
+    )}
+  </VStack>
 );
 
-export default ListItemInput;
-
-const ListItemContent = styled(ListItem.Content)({
-  root: {
-    alignItems: "stretch",
-  },
-});
-
-const Container = styled(View)({
-  root: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-});
-
-const StyledSlider = styled(Slider)({
-  root: {
-    flexGrow: 1,
-  },
-});
+export default ListItemSliderInput;

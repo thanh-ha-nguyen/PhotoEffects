@@ -1,9 +1,8 @@
 import ListItemSwitchInput from "@/components/ListItemSwitchInput";
+import { Group, List, Section } from "@/components/ui";
 import useSettings from "@/states/settings";
 import styled from "@/utils/styled";
-import { ListItem } from "@rneui/themed";
 import React from "react";
-import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const SettingsTab: React.FC = () => {
@@ -12,49 +11,33 @@ const SettingsTab: React.FC = () => {
 
   return (
     <StyledSafeAreaView>
-      <ScrollView>
-        <ListItem>
-          <ListItem.Content>
-            <ListItem.Title>General</ListItem.Title>
-          </ListItem.Content>
-        </ListItem>
-        <Container>
-          <ListItemSwitchInput
-            inputProps={{
-              value: performanceMode === "performance",
-              onValueChange: (value) => {
-                setPerformanceMode(
-                  value ? "performance" : "resource-intensive",
-                );
-              },
-            }}
-            label={"Performace"}
-            helperText="Turn off performance mode to reduce memory consumed."
-          />
-        </Container>
-      </ScrollView>
+      <List>
+        <Section title="General">
+          <Group>
+            <ListItemSwitchInput
+              inputProps={{
+                value: performanceMode === "performance",
+                onValueChange: (value) => {
+                  setPerformanceMode(
+                    value ? "performance" : "resource-intensive",
+                  );
+                },
+              }}
+              label={"Performance"}
+              helperText="Turn off performance mode to reduce memory consumed."
+            />
+          </Group>
+        </Section>
+      </List>
     </StyledSafeAreaView>
   );
 };
 
 export default SettingsTab;
 
-const Container = styled(View)((theme) => ({
-  root: {
-    backgroundColor: theme.colors.white,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 16,
-    marginHorizontal: 4,
-    padding: 8,
-    overflow: "hidden",
-  },
-}));
-
-const StyledSafeAreaView = styled(SafeAreaView)((theme) => ({
+const StyledSafeAreaView = styled(SafeAreaView)({
   root: {
     flex: 1,
-    padding: 8,
-    backgroundColor: theme.colors.background,
+    backgroundColor: "#F2F2F7", // Default iOS light gray background
   },
-}));
+});

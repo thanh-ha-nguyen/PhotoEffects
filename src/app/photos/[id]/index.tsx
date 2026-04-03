@@ -1,5 +1,6 @@
 import PanZoomView from "@/components/PanZoomView";
 import withPerformanceModeSettings from "@/components/withPerformanceModeSettings";
+import { Button, HStack } from "@/components/ui";
 import {
   ImageEffect,
   ImageEffectTypes,
@@ -10,18 +11,16 @@ import { PhotoEffectEntity } from "@/persistence/schema";
 import usePhotoActiveRecord from "@/states/photoActiveRecord";
 import styled from "@/utils/styled";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "@rneui/themed";
 import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useEffect } from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot from "react-native-view-shot";
 
 const ImageEditorScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-  const { theme } = useTheme();
   const photo = usePhotoActiveRecord((state) => state.photo);
   const effects = usePhotoActiveRecord((state) => state.photoEffects);
   const isLoading = usePhotoActiveRecord((state) => state.isLoading);
@@ -113,31 +112,19 @@ const ImageEditorScreen: React.FC = () => {
         </PanZoomView>
       )}
       <FloatingButtonContainer style={{ bottom: insets.bottom }}>
-        <Link href={`/photos/${id}/effects`} asChild>
-          <TouchableOpacity activeOpacity={0.8}>
-            <FloatingButton>
-              <Ionicons
-                name="color-palette"
-                size={30}
-                color={theme.colors.primary}
-              />
-            </FloatingButton>
-          </TouchableOpacity>
-        </Link>
-        <TouchableOpacity activeOpacity={0.8} onPress={handleShare}>
-          <FloatingButton>
-            <Ionicons
-              name="share-outline"
-              size={30}
-              color={theme.colors.primary}
-            />
-          </FloatingButton>
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
-          <FloatingButton>
-            <Ionicons name="trash" size={30} color={theme.colors.error} />
-          </FloatingButton>
-        </TouchableOpacity>
+        <HStack style={{ gap: 20 }}>
+          <Link href={`/photos/${id}/effects`} asChild>
+            <Button>
+              <Ionicons name="color-palette" size={24} color="white" />
+            </Button>
+          </Link>
+          <Button onPress={handleShare}>
+            <Ionicons name="share-outline" size={24} color="white" />
+          </Button>
+          <Button onPress={handleDelete}>
+            <Ionicons name="trash" size={24} color="#FF3B30" />
+          </Button>
+        </HStack>
       </FloatingButtonContainer>
     </StyledGestureHandlerRootView>
   );
@@ -151,31 +138,15 @@ const StyledGestureHandlerRootView = styled(GestureHandlerRootView)({
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#000000", // Default black for photo editor
   },
 });
 
 const FloatingButtonContainer = styled(View)({
   root: {
     position: "absolute",
-    bottom: 20,
     left: "50%",
     transform: [{ translateX: "-50%" }],
-    flexDirection: "row",
-    gap: 20,
-  },
-});
-
-const FloatingButton = styled(View)({
-  root: {
-    backgroundColor: "white",
-    borderRadius: 9999,
-    opacity: 0.8,
-    padding: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
 });
 

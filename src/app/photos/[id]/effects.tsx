@@ -1,11 +1,11 @@
 import DeleteableListItem from "@/components/DeleteableListItem";
+import { Group, List, Section, Text, VStack } from "@/components/ui";
 import { ImageEffects } from "@/modules/expo-opencv";
 import usePhotoActiveRecord from "@/states/photoActiveRecord";
 import styled from "@/utils/styled";
-import { ListItem } from "@rneui/themed";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   SafeAreaView,
@@ -26,39 +26,49 @@ const ImageEffectsEditorScreen = () => {
   }, [id, loadPhotoById]);
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={StyleSheet.absoluteFill}>
         <Stack.Screen
           options={{ headerTitle: isLoading ? "Loading..." : "Effects" }}
         />
         <StyledScrollView style={{ marginTop: -insets.top }}>
-          <HeaderText>In-use</HeaderText>
-          {effects && effects.length > 0 ? (
-            <List>
-              {effects?.map((effect, index) => (
-                <DeleteableListItem
-                  key={effect.id || -index}
-                  onDelete={() => removeEffect(effect.id)}
+          <Section title="In-use">
+            {effects && effects.length > 0 ? (
+              <Group>
+                {effects?.map((effect, index) => (
+                  <DeleteableListItem
+                    key={effect.id || -index}
+                    onDelete={() => removeEffect(effect.id)}
+                  >
+                    <VStack style={{ paddingVertical: 12 }}>
+                      <Text style={{ fontSize: 17 }}>{effect.effectName}</Text>
+                    </VStack>
+                  </DeleteableListItem>
+                ))}
+              </Group>
+            ) : (
+              <EmptyText>No effects applied to this photo yet.</EmptyText>
+            )}
+          </Section>
+
+          <Section title="Available">
+            <Group>
+              {ImageEffects.map((effect) => (
+                <TouchableOpacity
+                  key={effect}
+                  onPress={() => addEffect(effect)}
+                  style={{
+                    paddingVertical: 12,
+                    paddingHorizontal: 16,
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                    borderBottomColor: "#ccc",
+                  }}
                 >
-                  <ListItem.Content>
-                    <ListItem.Title>{effect.effectName}</ListItem.Title>
-                  </ListItem.Content>
-                </DeleteableListItem>
+                  <Text style={{ fontSize: 17 }}>{effect}</Text>
+                </TouchableOpacity>
               ))}
-            </List>
-          ) : (
-            <EmptyText>No effects applied to this photo yet.</EmptyText>
-          )}
-          <HeaderText>Available</HeaderText>
-          <List>
-            {ImageEffects.map((effect) => (
-              <ListItem key={effect} onPress={() => addEffect(effect)}>
-                <ListItem.Content>
-                  <ListItem.Title>{effect}</ListItem.Title>
-                </ListItem.Content>
-              </ListItem>
-            ))}
-          </List>
+            </Group>
+          </Section>
         </StyledScrollView>
       </SafeAreaView>
     </GestureHandlerRootView>
@@ -70,41 +80,16 @@ export default ImageEffectsEditorScreen;
 const StyledScrollView = styled(ScrollView)({
   root: {
     flex: 1,
-    flexDirection: "column",
-    padding: 16,
-  },
-});
-
-const HeaderText = styled(Text)({
-  root: {
-    fontFamily: "Inter Regular",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 16,
+    backgroundColor: "#F2F2F7", // Default iOS light gray background
   },
 });
 
 const EmptyText = styled(Text)({
   root: {
-    fontFamily: "Inter Regular",
     fontSize: 14,
     fontStyle: "italic",
     color: "#666",
     textAlign: "center",
-    marginBottom: 16,
-  },
-});
-
-const List = styled(View)({
-  root: {
-    backgroundColor: "#ccc",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 16,
-    flex: 1,
-    flexDirection: "column",
-    gap: 1,
-    marginBottom: 24,
-    overflow: "hidden",
+    padding: 20,
   },
 });

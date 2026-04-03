@@ -1,63 +1,42 @@
-import styled from "@/utils/styled";
-import type { ListItemSubtitleProps, ListItemTitleProps } from "@rneui/base";
-import { ListItem, type ListItemProps } from "@rneui/themed";
+import { HStack, List, Section, Switch, Text, VStack } from "@/components/ui";
 import React from "react";
-import { Switch, SwitchProps, View } from "react-native";
 
-export interface ListItemSwitchInputProps extends ListItemProps {
+export interface ListItemSwitchInputProps {
   helperText?: string;
-  helperTextProps?: ListItemSubtitleProps;
-  inputProps?: Omit<SwitchProps, "ref">;
+  inputProps?: {
+    value: boolean;
+    onValueChange: (value: boolean) => void;
+  };
   label?: string;
-  labelProps?: ListItemTitleProps;
 }
 
 const ListItemSwitchInput: React.FC<ListItemSwitchInputProps> = ({
   helperText,
-  helperTextProps,
   inputProps,
   label,
-  labelProps,
-  ...props
 }) => (
-  <ListItem {...props}>
-    <ListItemContent>
-      <StyledView>
-        {label && <ListItem.Title {...labelProps}>{label}</ListItem.Title>}
-        <StyledSwitch {...inputProps} />
-      </StyledView>
-      {helperText && (
-        <ListItemSubtitle {...helperTextProps}>{helperText}</ListItemSubtitle>
+  <VStack>
+    <HStack
+      style={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingVertical: 10,
+      }}
+    >
+      {label && <Text style={{ fontSize: 17, fontWeight: "500" }}>{label}</Text>}
+      {inputProps && (
+        <Switch
+          value={inputProps.value}
+          onValueChange={inputProps.onValueChange}
+        />
       )}
-    </ListItemContent>
-  </ListItem>
+    </HStack>
+    {helperText && (
+      <Text style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
+        {helperText}
+      </Text>
+    )}
+  </VStack>
 );
 
 export default ListItemSwitchInput;
-
-const ListItemContent = styled(ListItem.Content)({
-  root: {
-    alignItems: "stretch",
-  },
-});
-
-const ListItemSubtitle = styled(ListItem.Subtitle)({
-  root: {
-    marginTop: 16,
-  },
-});
-
-const StyledView = styled(View)({
-  root: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-});
-
-const StyledSwitch = styled(Switch)({
-  root: {
-    marginLeft: "auto",
-  },
-});

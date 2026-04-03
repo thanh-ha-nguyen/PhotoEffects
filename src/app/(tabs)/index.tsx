@@ -1,10 +1,10 @@
+import { Button, HStack, ZStack } from "@/components/ui";
 import withPerformanceModeSettings from "@/components/withPerformanceModeSettings";
 import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
 import styled from "@/utils/styled";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useTheme } from "@rneui/themed";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
@@ -18,7 +18,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from "react-native";
 import {
   SafeAreaView,
@@ -32,7 +31,6 @@ import {
 
 const ImagesListScreen: React.FC = () => {
   const [images, setImages] = useState<PhotoEntity[]>([]);
-  const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   // Safely load images from DB on focus
@@ -56,14 +54,12 @@ const ImagesListScreen: React.FC = () => {
   );
 
   const pickImages = async () => {
-    // Ask for permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       alert("Sorry, we need camera roll permissions to make this work!");
       return;
     }
 
-    // Pick multiple images
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsMultipleSelection: true,
@@ -72,7 +68,6 @@ const ImagesListScreen: React.FC = () => {
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      // Update state with new images
       const selectedPhotos = result.assets.map((asset) => ({
         uri: asset.uri,
         mimeType: asset.mimeType || null,
@@ -80,14 +75,12 @@ const ImagesListScreen: React.FC = () => {
         height: asset.height,
       }));
 
-      // Save each image to DB
       const savedPhotos = await insertPhotos(...selectedPhotos);
       setImages((current) => [...current, ...savedPhotos]);
     }
   };
 
   const takePhoto = async () => {
-    // Ask for camera permission
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
       alert("Sorry, we need camera permissions to take photos!");
@@ -95,7 +88,6 @@ const ImagesListScreen: React.FC = () => {
     }
 
     try {
-      // Open camera to take a photo
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         quality: 1,
@@ -110,12 +102,10 @@ const ImagesListScreen: React.FC = () => {
           height: asset.height,
         };
 
-        // Save the captured photo to DB
         const savedPhotos = await insertPhotos(newPhoto);
         setImages((current) => [...current, ...savedPhotos]);
       }
     } catch (error) {
-      // Camera is not available on simulators
       console.error("Error launching camera:", error);
       Alert.alert(
         "Camera Unavailable",
@@ -133,7 +123,6 @@ const ImagesListScreen: React.FC = () => {
       },
       async (buttonIndex) => {
         if (buttonIndex === 1) {
-          // Share
           if (await Sharing.isAvailableAsync()) {
             try {
               const safeUri =
@@ -149,7 +138,6 @@ const ImagesListScreen: React.FC = () => {
             }
           }
         } else if (buttonIndex === 2) {
-          // Delete
           Alert.alert(
             "Delete Photo",
             "Are you sure you want to delete this photo?",
@@ -193,16 +181,14 @@ const ImagesListScreen: React.FC = () => {
         </Container>
       )}
       <FloatingButtonContainer style={{ bottom: (insets.bottom || 0) + 20 }}>
-        <TouchableOpacity activeOpacity={0.8} onPress={takePhoto}>
-          <FloatingButton>
-            <Ionicons name="camera" size={30} color={theme.colors.primary} />
-          </FloatingButton>
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.8} onPress={pickImages}>
-          <FloatingButton>
-            <Ionicons name="images" size={30} color={theme.colors.primary} />
-          </FloatingButton>
-        </TouchableOpacity>
+        <HStack style={{ gap: 24 }}>
+          <Button onPress={takePhoto} style={styles.fab}>
+            <Ionicons name="camera" size={24} color="#007AFF" />
+          </Button>
+          <Button onPress={pickImages} style={styles.fab}>
+            <Ionicons name="images" size={24} color="#007AFF" />
+          </Button>
+        </HStack>
       </FloatingButtonContainer>
     </StyledSafeAreaView>
   );
@@ -227,18 +213,21 @@ const Image = styled(OpenCVImage)({
   },
 });
 
-const containerStyle: ViewStyle = {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-};
-
 const StyledSafeAreaView = styled(SafeAreaView)({
-  root: containerStyle,
+  root: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F2F2F7", // Default iOS light gray background
+  },
 });
 
 const Container = styled(View)({
-  root: containerStyle,
+  root: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 const StyledTouchableOpacity = styled(TouchableOpacity)({
@@ -254,27 +243,34 @@ const EmptyText = styled(Text)({
   },
 });
 
-const FloatingButtonContainer = styled(View)({
+const FloatingButtonContainer = styled(ZStack)({
   root: {
     position: "absolute",
-    bottom: 20,
     left: "50%",
     transform: [{ translateX: "-50%" }],
-    flexDirection: "row",
-    gap: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)", // Stronger glassmorphism
+    borderRadius: 40,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 15,
   },
 });
 
-const FloatingButton = styled(View)({
-  root: {
-    backgroundColor: "white",
-    borderRadius: 9999,
-    opacity: 0.8,
-    padding: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+const styles = StyleSheet.create({
+  fab: {
+    borderWidth: 1,
+    borderColor: "red",
+    width: 48,
+    height: 48,
+    borderRadius: 24, // Perfect circle
+    shadowColor: "#007AFF",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });
