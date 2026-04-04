@@ -1,9 +1,5 @@
-import { List as NativeList } from "@expo/ui/swift-ui";
-import React from "react";
-import { AutoHost } from "./utils.ios";
+import { List } from "@expo/ui/swift-ui";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
 
-export const List: React.FC<any> = ({ children, ...props }) => (
-  <AutoHost style={props.style} matchContents={true}>
-    <NativeList {...props}>{children}</NativeList>
-  </AutoHost>
-);
+export default withAutoHost(withMapStyleToModifiers(List));

@@ -1,4 +1,4 @@
-import { HStack, List, Section, Switch, Text, VStack } from "@/components/ui";
+import { HStack, Switch, Text, VStack } from "@/components/ui";
 import React from "react";
 
 export interface ListItemSwitchInputProps {
@@ -23,7 +23,9 @@ const ListItemSwitchInput: React.FC<ListItemSwitchInputProps> = ({
         paddingVertical: 10,
       }}
     >
-      {label && <Text style={{ fontSize: 17, fontWeight: "500" }}>{label}</Text>}
+      {label && (
+        <Text style={{ fontSize: 17, fontWeight: "500" }}>{label}</Text>
+      )}
       {inputProps && (
         <Switch
           value={inputProps.value}

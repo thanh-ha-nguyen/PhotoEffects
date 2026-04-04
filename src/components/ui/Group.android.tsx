@@ -1,2 +1,1 @@
-import { Column as Group } from "@expo/ui/jetpack-compose";
-export { Group };
+export { Column as default } from "@expo/ui/jetpack-compose";

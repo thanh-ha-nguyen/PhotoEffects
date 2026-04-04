@@ -9,9 +9,11 @@ interface BaseProps {
 /**
  * ZStack: A stack that overlays components on top of each other.
  */
-export const ZStack: React.FC<BaseProps> = ({ children, style }) => (
+const ZStack: React.FC<BaseProps> = ({ children, style }) => (
   <View style={[styles.zStack, style]}>{children}</View>
 );
+
+export default ZStack;
 
 const styles = StyleSheet.create({
   zStack: {

@@ -17,13 +17,15 @@ interface ButtonProps {
 /**
  * Button component: A standard interactive button.
  */
-export const Button: React.FC<ButtonProps> = ({ onPress, children, style }) => (
+const Button: React.FC<ButtonProps> = ({ onPress, children, style }) => (
   <TouchableOpacity onPress={onPress} style={style}>
     <View style={styles.button}>
       <Text style={styles.buttonText}>{children}</Text>
     </View>
   </TouchableOpacity>
 );
+
+export default Button;
 
 const styles = StyleSheet.create({
   button: {

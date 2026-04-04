@@ -9,9 +9,11 @@ interface BaseProps {
 /**
  * VStack: A vertical stack of components.
  */
-export const VStack: React.FC<BaseProps> = ({ children, style }) => (
+const VStack: React.FC<BaseProps> = ({ children, style }) => (
   <View style={[styles.vStack, style]}>{children}</View>
 );
+
+export default VStack;
 
 const styles = StyleSheet.create({
   vStack: {

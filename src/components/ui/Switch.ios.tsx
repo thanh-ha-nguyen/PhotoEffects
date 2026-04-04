@@ -1,13 +1,5 @@
 import { Toggle } from "@expo/ui/swift-ui";
-import React from "react";
-import { AutoHost } from "./utils.ios";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
 
-export const Switch: React.FC<{
-  value: boolean;
-  onValueChange: (value: boolean) => void;
-  style?: any;
-}> = ({ value, onValueChange, style }) => (
-  <AutoHost matchContents={true} style={style}>
-    <Toggle isOn={value} onIsOnChange={onValueChange} />
-  </AutoHost>
-);
+export default withAutoHost(withMapStyleToModifiers(Toggle));

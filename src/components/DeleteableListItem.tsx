@@ -1,4 +1,4 @@
-import { HStack, Text, VStack } from "@/components/ui";
+import { HStack, Text } from "@/components/ui";
 import React, { forwardRef } from "react";
 import {
   TouchableOpacity,

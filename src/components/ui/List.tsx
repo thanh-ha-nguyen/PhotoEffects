@@ -6,9 +6,11 @@ interface BaseProps {
   style?: StyleProp<ViewStyle>;
 }
 
-export const List: React.FC<BaseProps> = ({ children, style }) => (
+const List: React.FC<BaseProps> = ({ children, style }) => (
   <ScrollView style={[styles.list, style]}>{children}</ScrollView>
 );
+
+export default List;
 
 const styles = StyleSheet.create({
   list: {

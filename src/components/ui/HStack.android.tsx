@@ -1,2 +1,1 @@
-import { Row as HStack } from "@expo/ui/jetpack-compose";
-export { HStack };
+export { Row as default } from "@expo/ui/jetpack-compose";

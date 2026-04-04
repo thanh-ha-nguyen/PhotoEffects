@@ -6,7 +6,7 @@ import { StyleProp, ViewStyle } from "react-native";
  * Slider: A unified value slider component.
  * Fallback uses @react-native-community/slider.
  */
-export const Slider: React.FC<{
+const Slider: React.FC<{
   value: number;
   onValueChange: (value: number) => void;
   min?: number;
@@ -23,3 +23,5 @@ export const Slider: React.FC<{
     style={style}
   />
 );
+
+export default Slider;

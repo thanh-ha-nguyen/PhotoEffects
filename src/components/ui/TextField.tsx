@@ -1,2 +1,1 @@
-import { TextInput as TextField } from "react-native";
-export { TextField };
+export { TextInput as default } from "react-native";

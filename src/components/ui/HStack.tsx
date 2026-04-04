@@ -9,9 +9,11 @@ interface BaseProps {
 /**
  * HStack: A horizontal stack of components.
  */
-export const HStack: React.FC<BaseProps> = ({ children, style }) => (
+const HStack: React.FC<BaseProps> = ({ children, style }) => (
   <View style={[styles.hStack, style]}>{children}</View>
 );
+
+export default HStack;
 
 const styles = StyleSheet.create({
   hStack: {

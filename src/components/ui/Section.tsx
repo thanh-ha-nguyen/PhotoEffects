@@ -7,12 +7,14 @@ interface SectionProps {
   title?: string;
 }
 
-export const Section: React.FC<SectionProps> = ({ title, children, style }) => (
+const Section: React.FC<SectionProps> = ({ title, children, style }) => (
   <View style={[styles.section, style]}>
     {title && <Text style={styles.sectionTitle}>{title}</Text>}
     {children}
   </View>
 );
+
+export default Section;
 
 const styles = StyleSheet.create({
   section: {

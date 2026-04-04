@@ -1,11 +1,5 @@
-import { ZStack as NativeZStack } from "@expo/ui/swift-ui";
-import React from "react";
-import { AutoHost, mapStyleToModifiers } from "./utils.ios";
+import { ZStack } from "@expo/ui/swift-ui";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
 
-export const ZStack: React.FC<any> = ({ children, ...props }) => (
-  <AutoHost style={props.style} matchContents={true}>
-    <NativeZStack {...props} modifiers={mapStyleToModifiers(props.style)}>
-      {children}
-    </NativeZStack>
-  </AutoHost>
-);
+export default withAutoHost(withMapStyleToModifiers(ZStack));

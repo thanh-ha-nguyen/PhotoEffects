@@ -1,11 +1,16 @@
 import React from "react";
-import { StyleProp, Switch as NativeSwitch, View, ViewStyle } from "react-native";
+import {
+  Switch as NativeSwitch,
+  StyleProp,
+  View,
+  ViewStyle,
+} from "react-native";
 
 /**
  * Switch: A unified toggle component.
  * Fallback uses React Native's NativeSwitch.
  */
-export const Switch: React.FC<{
+const Switch: React.FC<{
   value: boolean;
   onValueChange: (value: boolean) => void;
   style?: StyleProp<ViewStyle>;
@@ -14,3 +19,5 @@ export const Switch: React.FC<{
     <NativeSwitch value={value} onValueChange={onValueChange} />
   </View>
 );
+
+export default Switch;

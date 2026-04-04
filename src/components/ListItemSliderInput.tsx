@@ -27,7 +27,9 @@ const ListItemSliderInput: React.FC<ListItemSliderInputProps> = ({
 }) => (
   <VStack style={{ paddingVertical: 10 }}>
     <HStack style={{ justifyContent: "space-between", marginBottom: 8 }}>
-      {label && <Text style={{ fontSize: 17, fontWeight: "500" }}>{label}</Text>}
+      {label && (
+        <Text style={{ fontSize: 17, fontWeight: "500" }}>{label}</Text>
+      )}
       {showValueLabel && inputProps && (
         <Text style={{ fontSize: 15, color: "#007AFF" }}>
           {valueLabelFormat(inputProps.value)}

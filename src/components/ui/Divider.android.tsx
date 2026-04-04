@@ -1,2 +1,1 @@
-import { HorizontalDivider as Divider } from "@expo/ui/jetpack-compose";
-export { Divider };
+export { HorizontalDivider as default } from "@expo/ui/jetpack-compose";

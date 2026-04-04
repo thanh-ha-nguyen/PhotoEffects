@@ -1,9 +1,5 @@
-import { Text as NativeText } from "@expo/ui/swift-ui";
-import React from "react";
-import { AutoHost } from "./utils.ios";
+import { Text } from "@expo/ui/swift-ui";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
 
-export const Text: React.FC<any> = ({ children, ...props }) => (
-  <AutoHost matchContents={true} style={props.style}>
-    <NativeText {...props}>{children}</NativeText>
-  </AutoHost>
-);
+export default withAutoHost(withMapStyleToModifiers(Text));

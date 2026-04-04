@@ -1,2 +1,5 @@
-import { Divider as NativeDivider } from "@expo/ui/swift-ui";
-export { NativeDivider as Divider };
+import { Divider } from "@expo/ui/swift-ui";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
+
+export default withAutoHost(withMapStyleToModifiers(Divider));

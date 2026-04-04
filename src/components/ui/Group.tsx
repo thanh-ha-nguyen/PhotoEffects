@@ -6,9 +6,11 @@ interface BaseProps {
   style?: StyleProp<ViewStyle>;
 }
 
-export const Group: React.FC<BaseProps> = ({ children, style }) => (
+const Group: React.FC<BaseProps> = ({ children, style }) => (
   <View style={[styles.group, style]}>{children}</View>
 );
+
+export default Group;
 
 const styles = StyleSheet.create({
   group: {

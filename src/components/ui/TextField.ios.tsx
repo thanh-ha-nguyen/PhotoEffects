@@ -1,9 +1,5 @@
-import { TextField as NativeTextField } from "@expo/ui/swift-ui";
-import React from "react";
-import { AutoHost } from "./utils.ios";
+import { TextField } from "@expo/ui/swift-ui";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
 
-export const TextField: React.FC<any> = (props) => (
-  <AutoHost matchContents={true} style={props.style}>
-    <NativeTextField {...props} />
-  </AutoHost>
-);
+export default withAutoHost(withMapStyleToModifiers(TextField));

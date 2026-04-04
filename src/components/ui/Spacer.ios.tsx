@@ -1,2 +1,5 @@
-import { Spacer as NativeSpacer } from "@expo/ui/swift-ui";
-export { NativeSpacer as Spacer };
+import { Spacer } from "@expo/ui/swift-ui";
+import withAutoHost from "./ios/withAutoHost";
+import withMapStyleToModifiers from "./ios/withMapStyleToModifiers";
+
+export default withAutoHost(withMapStyleToModifiers(Spacer));
