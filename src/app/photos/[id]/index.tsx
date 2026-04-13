@@ -9,11 +9,17 @@ import { deletePhotoById } from "@/persistence/photos";
 import { PhotoEffectEntity } from "@/persistence/schema";
 import usePhotoActiveRecord from "@/states/photoActiveRecord";
 import styled from "@/utils/styled";
-import { Ionicons } from "@expo/vector-icons";
-import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Button, Host, HStack, Image, ZStack } from "@expo/ui/swift-ui";
+import {
+  buttonStyle,
+  glassEffect,
+  padding,
+  tint,
+} from "@expo/ui/swift-ui/modifiers";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
 import React, { useEffect } from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ViewShot from "react-native-view-shot";
@@ -64,72 +70,112 @@ const ImageEditorScreen: React.FC = () => {
   }, [id, loadPhotoById]);
 
   return (
-    <StyledGestureHandlerRootView style={StyleSheet.absoluteFill}>
+    <Host style={{ flex: 1 }}>
       <Stack.Screen
         options={{
           headerTitle: isLoading ? "Loading..." : `Photo ${photo?.id}`,
         }}
       />
-      {photo && (
-        <View
-          style={{ position: "absolute", transform: [{ translateX: -10000 }] }}
-          pointerEvents="none"
-        >
-          <ViewShot
-            ref={offscreenViewShotRef}
-            options={{ format: "jpg", quality: 1.0 }}
-          >
-            <View collapsable={false}>
+      <ZStack alignment="bottom" modifiers={[padding()]}>
+        <StyledGestureHandlerRootView style={StyleSheet.absoluteFill}>
+          {photo && (
+            <View
+              style={{
+                position: "absolute",
+                transform: [{ translateX: -10000 }],
+              }}
+              pointerEvents="none"
+            >
+              <ViewShot
+                ref={offscreenViewShotRef}
+                options={{ format: "jpg", quality: 1.0 }}
+              >
+                <View collapsable={false}>
+                  <OpenCVImage
+                    source={{ uri: photo.uri }}
+                    effects={toImageEffects(effects)}
+                    contentFit="fill"
+                    style={{
+                      width:
+                        photo.width *
+                        Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                      height:
+                        photo.height *
+                        Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                    }}
+                  />
+                </View>
+              </ViewShot>
+            </View>
+          )}
+          {photo && (
+            <PanZoomView>
               <OpenCVImage
                 source={{ uri: photo.uri }}
                 effects={toImageEffects(effects)}
-                contentFit="fill"
+                contentFit="contain"
                 style={{
-                  width:
-                    photo.width *
-                    Math.min(1, 2048 / Math.max(photo.width, photo.height)),
-                  height:
-                    photo.height *
-                    Math.min(1, 2048 / Math.max(photo.width, photo.height)),
+                  width: photo.width,
+                  height: photo.height,
                 }}
               />
-            </View>
-          </ViewShot>
-        </View>
-      )}
-      {photo && (
-        <PanZoomView>
-          <OpenCVImage
-            source={{ uri: photo.uri }}
-            effects={toImageEffects(effects)}
-            contentFit="contain"
-            style={{
-              width: photo.width,
-              height: photo.height,
-            }}
-          />
-        </PanZoomView>
-      )}
-      <FloatingButtonContainer style={{ bottom: insets.bottom }}>
-        <Link href={`/photos/${id}/effects`} asChild>
-          <TouchableOpacity activeOpacity={0.8}>
-            <FloatingButton>
-              <Ionicons name="color-palette" size={30} color="royalblue" />
-            </FloatingButton>
-          </TouchableOpacity>
-        </Link>
-        <TouchableOpacity activeOpacity={0.8} onPress={handleShare}>
-          <FloatingButton>
-            <Ionicons name="share-outline" size={30} color="royalblue" />
-          </FloatingButton>
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.8} onPress={handleDelete}>
-          <FloatingButton>
-            <Ionicons name="trash" size={30} color="crimson" />
-          </FloatingButton>
-        </TouchableOpacity>
-      </FloatingButtonContainer>
-    </StyledGestureHandlerRootView>
+            </PanZoomView>
+          )}
+        </StyledGestureHandlerRootView>
+        <HStack>
+          <Button
+            modifiers={[
+              buttonStyle("bordered"),
+              glassEffect({
+                glass: { interactive: true, variant: "regular" },
+              }),
+              tint("primary"),
+            ]}
+            onPress={() => router.navigate(`/photos/${id}/effects`)}
+          >
+            <Image
+              systemName="sparkles.2"
+              size={24}
+              modifiers={[padding({ all: 4 })]}
+            />
+          </Button>
+          <Button
+            modifiers={[
+              buttonStyle("bordered"),
+              glassEffect({
+                glass: { interactive: true, variant: "regular" },
+              }),
+              padding({ leading: 12 }),
+              tint("primary"),
+            ]}
+            onPress={handleShare}
+          >
+            <Image
+              systemName="square.and.arrow.up"
+              size={24}
+              modifiers={[padding({ all: 4 })]}
+            />
+          </Button>
+          <Button
+            modifiers={[
+              buttonStyle("bordered"),
+              glassEffect({
+                glass: { interactive: true, variant: "regular" },
+              }),
+              padding({ leading: 12 }),
+            ]}
+            onPress={handleDelete}
+            role="destructive"
+          >
+            <Image
+              systemName="trash"
+              size={24}
+              modifiers={[padding({ all: 4 })]}
+            />
+          </Button>
+        </HStack>
+      </ZStack>
+    </Host>
   );
 };
 
@@ -141,31 +187,6 @@ const StyledGestureHandlerRootView = styled(GestureHandlerRootView)({
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
-  },
-});
-
-const FloatingButtonContainer = styled(View)({
-  root: {
-    position: "absolute",
-    bottom: 20,
-    left: "50%",
-    transform: [{ translateX: "-50%" }],
-    flexDirection: "row",
-    gap: 20,
-  },
-});
-
-const FloatingButton = styled(View)({
-  root: {
-    backgroundColor: "white",
-    borderRadius: 9999,
-    opacity: 0.8,
-    padding: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
 });
 

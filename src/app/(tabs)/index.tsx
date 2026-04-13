@@ -2,7 +2,8 @@ import withPerformanceModeSettings from "@/components/withPerformanceModeSetting
 import { OpenCVImage } from "@/modules/expo-opencv";
 import { PhotoEntity } from "@/persistence/schema";
 import styled from "@/utils/styled";
-import { Ionicons } from "@expo/vector-icons";
+import { Button, Host, HStack, Image, ZStack } from "@expo/ui/swift-ui";
+import { buttonStyle, padding } from "@expo/ui/swift-ui/modifiers";
 import { useFocusEffect } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
@@ -13,16 +14,13 @@ import {
   ActionSheetIOS,
   Alert,
   FlatList,
+  Text as RNText,
   StyleSheet,
-  Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
-  ViewStyle,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   deletePhotoById,
   getAllPhotos,
@@ -32,6 +30,7 @@ import {
 const ImagesListScreen: React.FC = () => {
   const [images, setImages] = useState<PhotoEntity[]>([]);
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
 
   // Safely load images from DB on focus
   useFocusEffect(
@@ -171,38 +170,52 @@ const ImagesListScreen: React.FC = () => {
   };
 
   return (
-    <StyledSafeAreaView>
-      <ImageList
-        data={images}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
-            <StyledTouchableOpacity onLongPress={() => handleLongPress(item)}>
-              <Image source={{ uri: item.uri }} />
-            </StyledTouchableOpacity>
-          </Link>
-        )}
-        horizontal={false}
-        numColumns={3}
-      />
-      {images.length === 0 && (
-        <Container style={StyleSheet.absoluteFill}>
-          <EmptyText>No photos selected.</EmptyText>
-        </Container>
-      )}
-      <FloatingButtonContainer style={{ bottom: (insets.bottom || 0) + 20 }}>
-        <TouchableOpacity activeOpacity={0.8} onPress={takePhoto}>
-          <FloatingButton>
-            <Ionicons name="camera" size={30} color="royalblue" />
-          </FloatingButton>
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.8} onPress={pickImages}>
-          <FloatingButton>
-            <Ionicons name="images" size={30} color="royalblue" />
-          </FloatingButton>
-        </TouchableOpacity>
-      </FloatingButtonContainer>
-    </StyledSafeAreaView>
+    <Host style={{ flex: 1 }}>
+      <ZStack alignment="topTrailing">
+        <View
+          style={{
+            flex: 1,
+            position: "absolute",
+            top: insets.top,
+            left: insets.left,
+            height: height - insets.bottom,
+            width: width - insets.right,
+          }}
+        >
+          <ImageList
+            data={images}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => (
+              <Link href={`/photos/${encodeURIComponent(item.id)}`} asChild>
+                <StyledTouchableOpacity
+                  onLongPress={() => handleLongPress(item)}
+                >
+                  <StyledImage source={{ uri: item.uri }} />
+                </StyledTouchableOpacity>
+              </Link>
+            )}
+            horizontal={false}
+            numColumns={3}
+          />
+          {images.length === 0 && (
+            <Container style={StyleSheet.absoluteFill}>
+              <EmptyText>No photos selected.</EmptyText>
+            </Container>
+          )}
+        </View>
+        <HStack modifiers={[padding()]}>
+          <Button modifiers={[buttonStyle("glass")]} onPress={takePhoto}>
+            <Image systemName="camera.fill" size={24} />
+          </Button>
+          <Button
+            modifiers={[buttonStyle("glass"), padding({ leading: 12 })]}
+            onPress={pickImages}
+          >
+            <Image systemName="photo.on.rectangle.angled.fill" size={24} />
+          </Button>
+        </HStack>
+      </ZStack>
+    </Host>
   );
 };
 
@@ -216,7 +229,7 @@ const ImageList = styled(FlatList<PhotoEntity>)({
   },
 });
 
-const Image = styled(OpenCVImage)({
+const StyledImage = styled(OpenCVImage)({
   root: {
     width: 100,
     height: 100,
@@ -225,18 +238,12 @@ const Image = styled(OpenCVImage)({
   },
 });
 
-const containerStyle: ViewStyle = {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const StyledSafeAreaView = styled(SafeAreaView)({
-  root: containerStyle,
-});
-
 const Container = styled(View)({
-  root: containerStyle,
+  root: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 const StyledTouchableOpacity = styled(TouchableOpacity)({
@@ -245,34 +252,9 @@ const StyledTouchableOpacity = styled(TouchableOpacity)({
   },
 });
 
-const EmptyText = styled(Text)({
+const EmptyText = styled(RNText)({
   root: {
     fontSize: 16,
     color: "#888",
-  },
-});
-
-const FloatingButtonContainer = styled(View)({
-  root: {
-    position: "absolute",
-    bottom: 20,
-    left: "50%",
-    transform: [{ translateX: "-50%" }],
-    flexDirection: "row",
-    gap: 20,
-  },
-});
-
-const FloatingButton = styled(View)({
-  root: {
-    backgroundColor: "white",
-    borderRadius: 9999,
-    opacity: 0.8,
-    padding: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
 });
