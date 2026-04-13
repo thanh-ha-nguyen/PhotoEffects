@@ -1,4 +1,3 @@
-import { useTheme } from "@rneui/themed";
 import React from "react";
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 
@@ -8,14 +7,7 @@ type RootStyle = {
 
 const styled =
   <C extends React.ElementType>(Component: C) =>
-  <
-    T extends
-      | RootStyle
-      | ((
-          theme: ReturnType<typeof useTheme>["theme"],
-          props: React.ComponentProps<C>,
-        ) => RootStyle),
-  >(
+  <T extends RootStyle | ((props: React.ComponentProps<C>) => RootStyle)>(
     styles: T,
   ) => {
     const StyledComponent: React.FC<
@@ -23,10 +15,9 @@ const styled =
         style?: StyleProp<ViewStyle | ImageStyle | TextStyle>;
       }
     > = ({ style: overridenStyle, ...props }) => {
-      const { theme } = useTheme();
       const computedStyle =
         typeof styles === "function"
-          ? styles(theme, props as React.ComponentProps<C>)
+          ? styles(props as React.ComponentProps<C>)
           : (styles as RootStyle);
       return (
         <Component

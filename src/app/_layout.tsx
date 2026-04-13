@@ -9,7 +9,6 @@ import {
   Inter_700Bold_Italic,
 } from "@expo-google-fonts/inter";
 import { useFonts } from "@expo-google-fonts/inter/useFonts";
-import { ThemeProvider } from "@rneui/themed";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { SplashScreen, Stack } from "expo-router";
@@ -67,16 +66,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-            headerTitle: "Back",
-          }}
-        />
-      </Stack>
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+          headerTitle: "Back",
+        }}
+      />
+    </Stack>
   );
 }

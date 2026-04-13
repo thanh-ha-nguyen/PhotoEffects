@@ -1,7 +1,7 @@
 import { Platform } from "expo-modules-core";
 
 import {
-  ImageNativeProps,
+  NativeImageViewProps,
   ImageSource,
   OpenCVImageProps,
 } from "../ExpoOpenCV.types";
@@ -67,7 +67,7 @@ export function resolveSource(
  */
 export function resolveSources(
   sources?: OpenCVImageProps["source"],
-): ImageNativeProps["source"] {
+): NativeImageViewProps["source"] {
   if (Array.isArray(sources)) {
     return sources.map(resolveSource).filter(Boolean) as ImageSource[];
   }

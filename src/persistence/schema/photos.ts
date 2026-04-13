@@ -6,7 +6,6 @@ const photos = sqliteTable("photos", {
   mimeType: text("mime_type"),
   width: integer("width").notNull(),
   height: integer("height").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
 export default photos;

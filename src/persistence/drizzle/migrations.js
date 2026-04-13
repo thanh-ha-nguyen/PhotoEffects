@@ -3,6 +3,7 @@
 import m0000 from "./0000_initial.sql";
 import m0001 from "./0001_add_photo_effects.sql";
 import m0002 from "./0002_add_order_column_to_photo_effects.sql";
+import m0003 from "./0003_remove_timestamp_colums.sql";
 import journal from "./meta/_journal.json";
 
 export default {
@@ -11,5 +12,6 @@ export default {
     m0000,
     m0001,
     m0002,
+    m0003,
   },
 };

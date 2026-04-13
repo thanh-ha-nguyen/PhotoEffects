@@ -13,8 +13,6 @@ const photoEffects = sqliteTable(
     order: integer("order").notNull(),
     effectName: text("effect_name").notNull(),
     effectOptions: text("effect_options_json"),
-    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp" }),
     photoId: integer("photo_id").notNull(),
   },
   (table) => [
@@ -30,7 +28,4 @@ const photoEffects = sqliteTable(
 export default photoEffects;
 
 export type PhotoEffectEntity = typeof photoEffects.$inferSelect;
-export type PhotoEffect = Omit<
-  typeof photoEffects.$inferInsert,
-  "createdAt" | "updatedAt"
->;
+export type PhotoEffect = typeof photoEffects.$inferInsert;
