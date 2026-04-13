@@ -38,18 +38,18 @@ This demonstrates a deep understanding of mobile development, moving beyond just
 
 ## Screenshots
 
-[Main screen](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.10.42.png)
+![Main screen](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.10.42.png)
 
-[Add photos from the gallery](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.11.03.png)
+![Add photos from the gallery](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.11.03.png)
 
-[Photo effects screen](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.11.32.png)
+![Photo effects screen](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.11.32.png)
 
-[Add an effect](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.11.49.png)
+![Add an effect](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.11.49.png)
 
-[Share an image](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.04.png)
+![Share an image](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.04.png)
 
-[Delete a photo](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.14.png)
+![Delete a photo](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.14.png)
 
-[Long press to show context menu](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.33.png)
+![Long press to show context menu](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.33.png)
 
-[Settings screen](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.44.png)
+![Settings screen](screenshots/Simulator%20Screenshot%20-%20iPhone%2017%20-%202026-04-13%20at%2021.12.44.png)
